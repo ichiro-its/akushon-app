@@ -13,5 +13,4 @@ export default function Input({id, label, width}) {
       }}
     />
   )
-
 }
