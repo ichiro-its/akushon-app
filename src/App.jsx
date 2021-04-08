@@ -64,7 +64,7 @@ const actionData = [
 ]; 
 
 const actionOptions = {
-  tableBodyMaxHeight: '558px',
+  tableBodyHeight: '610px',
   pagination: false,
   filter: false,
   download: false,
@@ -124,7 +124,7 @@ const poseData = [
 ]; 
 
 const poseOptions = {
-  tableBodyMaxHeight: '269px',
+  tableBodyHeight: '269px',
   pagination: false,
   filter: false,
   download: false,
@@ -225,6 +225,15 @@ function App() {
                       label="Pause" 
                       width="31%"
                     />
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <Card>
+                <CardContent>
+                  <MuiTypography variant="h6">
+                    Joints
+                  </MuiTypography>
                 </CardContent>
               </Card>
             </Grid>
