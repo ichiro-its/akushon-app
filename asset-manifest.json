@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.js": "/akushon-app/static/js/main.d0096894.chunk.js",
-    "main.js.map": "/akushon-app/static/js/main.d0096894.chunk.js.map",
+    "main.js": "/akushon-app/static/js/main.c5ec533b.chunk.js",
+    "main.js.map": "/akushon-app/static/js/main.c5ec533b.chunk.js.map",
     "runtime-main.js": "/akushon-app/static/js/runtime-main.63388120.js",
     "runtime-main.js.map": "/akushon-app/static/js/runtime-main.63388120.js.map",
-    "static/js/2.f11fd0cf.chunk.js": "/akushon-app/static/js/2.f11fd0cf.chunk.js",
-    "static/js/2.f11fd0cf.chunk.js.map": "/akushon-app/static/js/2.f11fd0cf.chunk.js.map",
+    "static/js/2.2c293814.chunk.js": "/akushon-app/static/js/2.2c293814.chunk.js",
+    "static/js/2.2c293814.chunk.js.map": "/akushon-app/static/js/2.2c293814.chunk.js.map",
     "index.html": "/akushon-app/index.html",
-    "static/js/2.f11fd0cf.chunk.js.LICENSE.txt": "/akushon-app/static/js/2.f11fd0cf.chunk.js.LICENSE.txt"
+    "static/js/2.2c293814.chunk.js.LICENSE.txt": "/akushon-app/static/js/2.2c293814.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.63388120.js",
-    "static/js/2.f11fd0cf.chunk.js",
-    "static/js/main.d0096894.chunk.js"
+    "static/js/2.2c293814.chunk.js",
+    "static/js/main.c5ec533b.chunk.js"
   ]
 }
