@@ -20,6 +20,8 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ToggleOffIcon from "@material-ui/icons/ToggleOff";
 import Input from "./components/Input";
+import ActionTable from "./components/ActionTable";
+import PoseTable from "./components/PoseTable";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,32 +32,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const actionColumns = [
-  {
-    name: "id",
-    label: "#",
-    options: {
-      filter: true,
-      sort: true,
-    },
-  },
-  {
-    name: "name",
-    label: "Name",
-    options: {
-      filter: true,
-      sort: true,
-    },
-  },
-  {
-    name: "next",
-    label: "Next",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-];
+// const actionColumns = [
+//   {
+//     name: "id",
+//     label: "#",
+//     options: {
+//       filter: true,
+//       sort: true,
+//     },
+//   },
+//   {
+//     name: "name",
+//     label: "Name",
+//     options: {
+//       filter: true,
+//       sort: true,
+//     },
+//   },
+//   {
+//     name: "next",
+//     label: "Next",
+//     options: {
+//       filter: false,
+//       sort: false,
+//     },
+//   },
+// ];
 
 const actionData = [
   { id: 1, name: "action_1", next: 0 },
@@ -70,81 +72,81 @@ const actionData = [
   { id: 10, name: "action_10", next: 0 },
 ];
 
-const actionOptions = {
-  tableBodyHeight: "610px",
-  pagination: false,
-  filter: false,
-  download: false,
-  print: false,
-  search: true,
-  selectableRows: "single",
-  sortOrder: {
-    name: "ID",
-    direction: "asc",
-  },
-  selectableRowsOnClick: true,
-  selectableRowsHideCheckboxes: true,
-};
+// const actionOptions = {
+//   tableBodyHeight: "610px",
+//   pagination: false,
+//   filter: false,
+//   download: false,
+//   print: false,
+//   search: true,
+//   selectableRows: "single",
+//   sortOrder: {
+//     name: "ID",
+//     direction: "asc",
+//   },
+//   selectableRowsOnClick: true,
+//   selectableRowsHideCheckboxes: true,
+// };
 
-const poseColumns = [
-  {
-    name: "id",
-    label: "#",
-    options: {
-      filter: true,
-      sort: false,
-      customBodyRender: (rowIndex, dataIndex) => dataIndex.rowIndex + 1,
-    },
-  },
-  {
-    name: "name",
-    label: "Name",
-    options: {
-      filter: true,
-      sort: true,
-    },
-  },
-  {
-    name: "speed",
-    label: "Speed",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-  {
-    name: "pause",
-    label: "Pause",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-];
+// const poseColumns = [
+//   {
+//     name: "id",
+//     label: "#",
+//     options: {
+//       filter: true,
+//       sort: false,
+//       customBodyRender: (rowIndex, dataIndex) => dataIndex.rowIndex + 1,
+//     },
+//   },
+//   {
+//     name: "name",
+//     label: "Name",
+//     options: {
+//       filter: true,
+//       sort: true,
+//     },
+//   },
+//   {
+//     name: "speed",
+//     label: "Speed",
+//     options: {
+//       filter: false,
+//       sort: false,
+//     },
+//   },
+//   {
+//     name: "pause",
+//     label: "Pause",
+//     options: {
+//       filter: false,
+//       sort: false,
+//     },
+//   },
+// ];
 
 const poseData = [
   { name: "pose_1", speed: 0.5, pause: 1.5 },
   { name: "pose_2", speed: 0.5, pause: 1.5 },
   { name: "pose_3", speed: 0.5, pause: 1.5 },
   { name: "pose_4", speed: 0.5, pause: 1.5 },
-  { name: "pose_4", speed: 0.5, pause: 1.5 },
+  { name: "pose_5", speed: 0.5, pause: 1.5 },
 ];
 
-const poseOptions = {
-  tableBodyHeight: "269px",
-  pagination: false,
-  filter: false,
-  download: false,
-  print: false,
-  search: true,
-  selectableRows: "single",
-  sortOrder: {
-    name: "ID",
-    direction: "asc",
-  },
-  selectableRowsOnClick: true,
-  selectableRowsHideCheckboxes: true,
-};
+// const poseOptions = {
+//   tableBodyHeight: "269px",
+//   pagination: false,
+//   filter: false,
+//   download: false,
+//   print: false,
+//   search: true,
+//   selectableRows: "single",
+//   sortOrder: {
+//     name: "ID",
+//     direction: "asc",
+//   },
+//   selectableRowsOnClick: true,
+//   selectableRowsHideCheckboxes: true,
+// };
 
 const jointData = [
   { id: 1, position: 0 },
@@ -271,28 +273,30 @@ function App() {
         <CardContent>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
-              <MUIDataTable
+              {/* <MUIDataTable
                 title="Action List"
                 data={actionData}
                 columns={actionColumns}
                 options={actionOptions}
-              />
+              /> */}
+              <ActionTable rows={actionData} />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <Card>
                 <CardContent>
                   <MuiTypography variant="h6">Action</MuiTypography>
                   <div style={{ marginBottom: 10 }}>
-                    <Input id="action-name" label="Name" width="66%" />
-                    <Input id="action-next" label="Next" width="31%" />
+                    <Input id="action-name" label="Name" width="60%" />
+                    <Input id="action-next" label="Next" width="30%" />
                   </div>
 
-                  <MUIDataTable
+                  {/* <MUIDataTable
                     title="Pose List"
                     data={poseData}
                     columns={poseColumns}
                     options={poseOptions}
-                  />
+                  /> */}
+                  <PoseTable rows={poseData} />
 
                   <div style={{ marginTop: 10, marginBottom: -10 }}>
                     <Button
@@ -310,7 +314,7 @@ function App() {
                       className={classes.button}
                       startIcon={<ArrowUpwardIcon />}
                     >
-                      Move Up
+                      Up
                     </Button>
                     <Button
                       variant="contained"
@@ -318,7 +322,7 @@ function App() {
                       className={classes.button}
                       startIcon={<ArrowDownwardIcon />}
                     >
-                      Move Down
+                      Down
                     </Button>
                   </div>
                 </CardContent>
@@ -326,9 +330,9 @@ function App() {
               <Card style={{ marginTop: 10 }}>
                 <CardContent>
                   <MuiTypography variant="h6">Pose</MuiTypography>
-                  <Input id="pose-name" label="Name" width="31%" />
-                  <Input id="pose-speed" label="Speed" width="31%" />
-                  <Input id="pose-pause" label="Pause" width="31%" />
+                  <Input id="pose-name" label="Name" width="40%" />
+                  <Input id="pose-speed" label="Speed" width="25%" />
+                  <Input id="pose-pause" label="Pause" width="25%" />
                 </CardContent>
               </Card>
             </Grid>
