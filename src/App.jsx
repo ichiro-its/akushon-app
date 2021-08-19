@@ -4,24 +4,18 @@ import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import MuiAppBar from "@material-ui/core/AppBar";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
 import MuiToolbar from "@material-ui/core/Toolbar";
 import MuiTypography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import MUIDataTable from "mui-datatables";
 
 import AddIcon from "@material-ui/icons/Add";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import ToggleOffIcon from "@material-ui/icons/ToggleOff";
 import Input from "./components/Input";
 import ActionTable from "./components/ActionTable";
 import PoseTable from "./components/PoseTable";
+import JointTable from "./components/JointTable";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,33 +25,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
   },
 }));
-
-// const actionColumns = [
-//   {
-//     name: "id",
-//     label: "#",
-//     options: {
-//       filter: true,
-//       sort: true,
-//     },
-//   },
-//   {
-//     name: "name",
-//     label: "Name",
-//     options: {
-//       filter: true,
-//       sort: true,
-//     },
-//   },
-//   {
-//     name: "next",
-//     label: "Next",
-//     options: {
-//       filter: false,
-//       sort: false,
-//     },
-//   },
-// ];
 
 const actionData = [
   { id: 1, name: "action_1", next: 0 },
@@ -72,58 +39,6 @@ const actionData = [
   { id: 10, name: "action_10", next: 0 },
 ];
 
-// const actionOptions = {
-//   tableBodyHeight: "610px",
-//   pagination: false,
-//   filter: false,
-//   download: false,
-//   print: false,
-//   search: true,
-//   selectableRows: "single",
-//   sortOrder: {
-//     name: "ID",
-//     direction: "asc",
-//   },
-//   selectableRowsOnClick: true,
-//   selectableRowsHideCheckboxes: true,
-// };
-
-// const poseColumns = [
-//   {
-//     name: "id",
-//     label: "#",
-//     options: {
-//       filter: true,
-//       sort: false,
-//       customBodyRender: (rowIndex, dataIndex) => dataIndex.rowIndex + 1,
-//     },
-//   },
-//   {
-//     name: "name",
-//     label: "Name",
-//     options: {
-//       filter: true,
-//       sort: true,
-//     },
-//   },
-//   {
-//     name: "speed",
-//     label: "Speed",
-//     options: {
-//       filter: false,
-//       sort: false,
-//     },
-//   },
-//   {
-//     name: "pause",
-//     label: "Pause",
-//     options: {
-//       filter: false,
-//       sort: false,
-//     },
-//   },
-// ];
-
 const poseData = [
   { name: "pose_1", speed: 0.5, pause: 1.5 },
   { name: "pose_2", speed: 0.5, pause: 1.5 },
@@ -132,132 +47,28 @@ const poseData = [
   { name: "pose_5", speed: 0.5, pause: 1.5 },
 ];
 
-// const poseOptions = {
-//   tableBodyHeight: "269px",
-//   pagination: false,
-//   filter: false,
-//   download: false,
-//   print: false,
-//   search: true,
-//   selectableRows: "single",
-//   sortOrder: {
-//     name: "ID",
-//     direction: "asc",
-//   },
-//   selectableRowsOnClick: true,
-//   selectableRowsHideCheckboxes: true,
-// };
-
 const jointData = [
-  { id: 1, position: 0 },
-  { id: 2, position: 0 },
-  { id: 3, position: 0 },
-  { id: 4, position: 0 },
-  { id: 5, position: 0 },
-  { id: 6, position: 0 },
-  { id: 7, position: 0 },
-  { id: 8, position: 0 },
-  { id: 9, position: 0 },
-  { id: 10, position: 0 },
-  { id: 11, position: 0 },
-  { id: 12, position: 0 },
-  { id: 13, position: 0 },
-  { id: 14, position: 0 },
-  { id: 15, position: 0 },
-  { id: 16, position: 0 },
-  { id: 17, position: 0 },
-  { id: 18, position: 0 },
-  { id: 19, position: 0 },
-  { id: 20, position: 0 },
+  { id: 1, pose_pos: 0, robot_pos: 0 },
+  { id: 2, pose_pos: 0, robot_pos: 0 },
+  { id: 3, pose_pos: 0, robot_pos: 0 },
+  { id: 4, pose_pos: 0, robot_pos: 0 },
+  { id: 5, pose_pos: 0, robot_pos: 0 },
+  { id: 6, pose_pos: 0, robot_pos: 0 },
+  { id: 7, pose_pos: 0, robot_pos: 0 },
+  { id: 8, pose_pos: 0, robot_pos: 0 },
+  { id: 9, pose_pos: 0, robot_pos: 0 },
+  { id: 10, pose_pos: 0, robot_pos: 0 },
+  { id: 11, pose_pos: 0, robot_pos: 0 },
+  { id: 12, pose_pos: 0, robot_pos: 0 },
+  { id: 13, pose_pos: 0, robot_pos: 0 },
+  { id: 14, pose_pos: 0, robot_pos: 0 },
+  { id: 15, pose_pos: 0, robot_pos: 0 },
+  { id: 16, pose_pos: 0, robot_pos: 0 },
+  { id: 17, pose_pos: 0, robot_pos: 0 },
+  { id: 18, pose_pos: 0, robot_pos: 0 },
+  { id: 19, pose_pos: 0, robot_pos: 0 },
+  { id: 20, pose_pos: 0, robot_pos: 0 },
 ];
-
-const jointColumns = [
-  {
-    name: "id",
-    label: "ID",
-    options: {
-      filter: false,
-      sort: false,
-    },
-  },
-  {
-    name: "pose-position",
-    label: "Pose Pos.",
-    options: {
-      filter: false,
-      sort: false,
-      // eslint-disable-next-line react/display-name
-      customBodyRender: (value, tableMeta, updateValue) => (
-        <FormControlLabel
-          value={value}
-          control={<TextField value={value} />}
-          onChange={(event) => updateValue(event.target.value)}
-        />
-      ),
-    },
-  },
-  {
-    name: "robot-position",
-    label: "Robot Pos.",
-    options: {
-      filter: false,
-      sort: false,
-      // eslint-disable-next-line react/display-name
-      customBodyRender: (value, tableMeta, updateValue) => (
-        <FormControlLabel
-          value={value}
-          control={<TextField value={value} />}
-          onChange={(event) => updateValue(event.target.value)}
-        />
-      ),
-    },
-  },
-  {
-    name: "action",
-    label: "Action",
-    options: {
-      filter: false,
-      sort: false,
-      // eslint-disable-next-line react/display-name
-      setCellProps: () => ({ style: { minWidth: "150px" } }),
-      // eslint-disable-next-line react/display-name
-      customBodyRender: (value, tableMeta, updateValue) => (
-        <>
-          <IconButton aria-label="move-right">
-            <ArrowForwardIcon color="primary" />
-          </IconButton>
-          <IconButton aria-label="move-left">
-            <ArrowBackIcon color="primary" />
-          </IconButton>
-          <IconButton aria-label="torque">
-            <ToggleOffIcon />
-          </IconButton>
-        </>
-      ),
-    },
-  },
-];
-
-const jointOptions = {
-  tableBodyHeight: "610px",
-  pagination: false,
-  filter: false,
-  download: false,
-  print: false,
-  search: true,
-  selectableRows: "single",
-  sortOrder: {
-    name: "ID",
-    direction: "asc",
-  },
-  selectableRowsHideCheckboxes: true,
-  setRowProps: () => ({ style: { height: 0 } }),
-  setTableProps: () => {
-    return {
-      size: "small",
-    };
-  },
-};
 
 function App() {
   const classes = useStyles();
@@ -273,18 +84,12 @@ function App() {
         <CardContent>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
-              {/* <MUIDataTable
-                title="Action List"
-                data={actionData}
-                columns={actionColumns}
-                options={actionOptions}
-              /> */}
               <ActionTable rows={actionData} />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <Card>
                 <CardContent>
-                  <MuiTypography variant="h6">Action</MuiTypography>
+                  <MuiTypography variant="subtitle1">Action</MuiTypography>
                   <div style={{ marginBottom: 10 }}>
                     <Input id="action-name" label="Name" width="60%" />
                     <Input id="action-next" label="Next" width="30%" />
@@ -329,7 +134,7 @@ function App() {
               </Card>
               <Card style={{ marginTop: 10 }}>
                 <CardContent>
-                  <MuiTypography variant="h6">Pose</MuiTypography>
+                  <MuiTypography variant="subtitle1">Pose</MuiTypography>
                   <Input id="pose-name" label="Name" width="40%" />
                   <Input id="pose-speed" label="Speed" width="25%" />
                   <Input id="pose-pause" label="Pause" width="25%" />
@@ -337,12 +142,7 @@ function App() {
               </Card>
             </Grid>
             <Grid item xs={12} lg={4}>
-              <MUIDataTable
-                title="Joint List"
-                data={jointData}
-                columns={jointColumns}
-                options={jointOptions}
-              />
+              <JointTable rows={jointData} />
             </Grid>
           </Grid>
         </CardContent>

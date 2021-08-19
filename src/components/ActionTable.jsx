@@ -141,7 +141,7 @@ const ActionTableToolbar = (props) => {
       ) : (
         <Typography
           className={classes.title}
-          variant="h6"
+          variant="subtitle1"
           id="tableTitle"
           component="div"
         >

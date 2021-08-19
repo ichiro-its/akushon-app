@@ -142,7 +142,7 @@ const PoseTableToolbar = (props) => {
       ) : (
         <Typography
           className={classes.title}
-          variant="h6"
+          variant="subtitle1"
           id="tableTitle"
           component="div"
         >
@@ -177,7 +177,7 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     width: "100%",
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1),
   },
   table: {
     minWidth: 300,
@@ -190,7 +190,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     padding: 0,
     position: "absolute",
-    top: 20,
+    top: 10,
     width: 1,
   },
 }));
