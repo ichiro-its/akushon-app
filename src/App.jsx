@@ -10,12 +10,14 @@ import MuiTypography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 
 import AddIcon from "@material-ui/icons/Add";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import ToggleOffIcon from "@material-ui/icons/ToggleOff";
+import IconButton from "@material-ui/core/IconButton";
+import { DataGrid } from "@material-ui/data-grid";
 import Input from "./components/Input";
-import ActionTable from "./components/ActionTable";
-import PoseTable from "./components/PoseTable";
-import JointTable from "./components/JointTable";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const actionData = [
+const initActionData = [
   { id: 1, name: "action_1", next: 0 },
   { id: 2, name: "action_2", next: 0 },
   { id: 3, name: "action_3", next: 0 },
@@ -39,39 +41,141 @@ const actionData = [
   { id: 10, name: "action_10", next: 0 },
 ];
 
-const poseData = [
-  { name: "pose_1", speed: 0.5, pause: 1.5 },
-  { name: "pose_2", speed: 0.5, pause: 1.5 },
-  { name: "pose_3", speed: 0.5, pause: 1.5 },
-  { name: "pose_4", speed: 0.5, pause: 1.5 },
-  { name: "pose_5", speed: 0.5, pause: 1.5 },
+const actionColumns = [
+  {
+    field: "id",
+    headerName: "#",
+    width: 15,
+    editable: true,
+    sortable: false,
+  },
+  {
+    field: "name",
+    headerName: "Name",
+    width: 170,
+    editable: true,
+    sortable: false,
+  },
+  {
+    field: "next",
+    headerName: "Next",
+    width: 90,
+    type: "number",
+    editable: true,
+    sortable: false,
+  },
 ];
 
-const jointData = [
-  { id: 1, pose_pos: 0, robot_pos: 0 },
-  { id: 2, pose_pos: 0, robot_pos: 0 },
-  { id: 3, pose_pos: 0, robot_pos: 0 },
-  { id: 4, pose_pos: 0, robot_pos: 0 },
-  { id: 5, pose_pos: 0, robot_pos: 0 },
-  { id: 6, pose_pos: 0, robot_pos: 0 },
-  { id: 7, pose_pos: 0, robot_pos: 0 },
-  { id: 8, pose_pos: 0, robot_pos: 0 },
-  { id: 9, pose_pos: 0, robot_pos: 0 },
-  { id: 10, pose_pos: 0, robot_pos: 0 },
-  { id: 11, pose_pos: 0, robot_pos: 0 },
-  { id: 12, pose_pos: 0, robot_pos: 0 },
-  { id: 13, pose_pos: 0, robot_pos: 0 },
-  { id: 14, pose_pos: 0, robot_pos: 0 },
-  { id: 15, pose_pos: 0, robot_pos: 0 },
-  { id: 16, pose_pos: 0, robot_pos: 0 },
-  { id: 17, pose_pos: 0, robot_pos: 0 },
-  { id: 18, pose_pos: 0, robot_pos: 0 },
-  { id: 19, pose_pos: 0, robot_pos: 0 },
-  { id: 20, pose_pos: 0, robot_pos: 0 },
+const initPoseData = [
+  { id: 1, name: "pose_1", speed: 0.5, pause: 1.5 },
+  { id: 2, name: "pose_2", speed: 0.5, pause: 1.5 },
+  { id: 3, name: "pose_3", speed: 0.5, pause: 1.5 },
+  { id: 4, name: "pose_4", speed: 0.5, pause: 1.5 },
+  { id: 5, name: "pose_5", speed: 0.5, pause: 1.5 },
+];
+
+const poseColumns = [
+  {
+    field: "name",
+    headerName: "Name",
+    width: 125,
+    editable: true,
+    sortable: false,
+  },
+  {
+    field: "speed",
+    headerName: "Speed",
+    width: 125,
+    type: "number",
+    editable: true,
+    sortable: false,
+  },
+  {
+    field: "pause",
+    headerName: "Pause",
+    width: 125,
+    type: "number",
+    editable: true,
+    sortable: false,
+  },
+];
+
+const initJointPoseData = [
+  { id: 1, pose_pos: 0 },
+  { id: 2, pose_pos: 0 },
+  { id: 3, pose_pos: 0 },
+  { id: 4, pose_pos: 0 },
+  { id: 5, pose_pos: 0 },
+  { id: 6, pose_pos: 0 },
+  { id: 7, pose_pos: 0 },
+  { id: 8, pose_pos: 0 },
+  { id: 9, pose_pos: 0 },
+  { id: 10, pose_pos: 0 },
+  { id: 11, pose_pos: 0 },
+  { id: 12, pose_pos: 0 },
+  { id: 13, pose_pos: 0 },
+  { id: 14, pose_pos: 0 },
+  { id: 15, pose_pos: 0 },
+  { id: 16, pose_pos: 0 },
+  { id: 17, pose_pos: 0 },
+  { id: 18, pose_pos: 0 },
+  { id: 19, pose_pos: 0 },
+  { id: 20, pose_pos: 0 },
+];
+
+const initJointRobotData = [
+  { id: 1, robot_pos: 0 },
+  { id: 2, robot_pos: 0 },
+  { id: 3, robot_pos: 0 },
+  { id: 4, robot_pos: 0 },
+  { id: 5, robot_pos: 0 },
+  { id: 6, robot_pos: 0 },
+  { id: 7, robot_pos: 0 },
+  { id: 8, robot_pos: 0 },
+  { id: 9, robot_pos: 0 },
+  { id: 10, robot_pos: 0 },
+  { id: 11, robot_pos: 0 },
+  { id: 12, robot_pos: 0 },
+  { id: 13, robot_pos: 0 },
+  { id: 14, robot_pos: 0 },
+  { id: 15, robot_pos: 0 },
+  { id: 16, robot_pos: 0 },
+  { id: 17, robot_pos: 0 },
+  { id: 18, robot_pos: 0 },
+  { id: 19, robot_pos: 0 },
+  { id: 20, robot_pos: 0 },
+];
+
+const jointPoseColumns = [
+  { field: "id", headerName: "ID", width: 15, sortable: false },
+  {
+    field: "pose_pos",
+    headerName: "Pose Pos",
+    width: 100,
+    type: "number",
+    editable: true,
+    sortable: false,
+  },
+];
+
+const jointRobotColumns = [
+  { field: "id", headerName: "ID", width: 15, sortable: false },
+  {
+    field: "robot_pos",
+    headerName: "Robot Pos",
+    width: 100,
+    type: "number",
+    editable: true,
+    sortable: false,
+  },
 ];
 
 function App() {
   const classes = useStyles();
+  const actionData = initActionData;
+  const poseData = initPoseData;
+  const jointPoseData = initJointPoseData;
+  const jointRobotData = initJointRobotData;
 
   return (
     <div className={classes.root}>
@@ -83,8 +187,18 @@ function App() {
       <Card>
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={4}>
-              <ActionTable rows={actionData} />
+            <Grid item xs={12} md={6} lg={3}>
+              <div style={{ height: 640, width: "100%" }}>
+                <DataGrid
+                  rows={actionData}
+                  columns={actionColumns}
+                  rowHeight={32}
+                  disableColumnMenu
+                  rowsPerPageOptions={[]}
+                  // checkboxSelection
+                  // disableSelectionOnClick
+                />
+              </div>
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <Card>
@@ -94,14 +208,17 @@ function App() {
                     <Input id="action-name" label="Name" width="60%" />
                     <Input id="action-next" label="Next" width="30%" />
                   </div>
-
-                  {/* <MUIDataTable
-                    title="Pose List"
-                    data={poseData}
-                    columns={poseColumns}
-                    options={poseOptions}
-                  /> */}
-                  <PoseTable rows={poseData} />
+                  <div style={{ height: 300, width: "100%" }}>
+                    <DataGrid
+                      rows={poseData}
+                      columns={poseColumns}
+                      rowHeight={32}
+                      disableColumnMenu
+                      rowsPerPageOptions={[]}
+                      // checkboxSelection
+                      // disableSelectionOnClick
+                    />
+                  </div>
 
                   <div style={{ marginTop: 10, marginBottom: -10 }}>
                     <Button
@@ -141,8 +258,55 @@ function App() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} lg={4}>
-              <JointTable rows={jointData} />
+
+            <Grid item xs={6} lg={2}>
+              <div style={{ height: 640, width: "100%" }}>
+                <DataGrid
+                  rows={jointPoseData}
+                  columns={jointPoseColumns}
+                  rowHeight={25}
+                  checkboxSelection
+                  disableColumnMenu
+                  rowsPerPageOptions={[]}
+                  // disableSelectionOnClick
+                />
+              </div>
+            </Grid>
+            <Grid item xs={6} lg={1}>
+              <div
+                style={{
+                  margin: "auto",
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="default"
+                  className={classes.button}
+                  startIcon={<ArrowBackIcon />}
+                />
+                <Button
+                  variant="contained"
+                  color="default"
+                  className={classes.button}
+                  startIcon={<ArrowForwardIcon />}
+                />
+                <IconButton aria-label="torque">
+                  <ToggleOffIcon />
+                </IconButton>
+              </div>
+            </Grid>
+            <Grid item xs={6} lg={2}>
+              <div style={{ height: 640, width: "100%" }}>
+                <DataGrid
+                  rows={jointRobotData}
+                  columns={jointRobotColumns}
+                  rowHeight={25}
+                  checkboxSelection
+                  disableColumnMenu
+                  rowsPerPageOptions={[]}
+                  // disableSelectionOnClick
+                />
+              </div>
             </Grid>
           </Grid>
         </CardContent>
