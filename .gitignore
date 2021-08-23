@@ -6,9 +6,9 @@ dist-ssr
 *.local
 
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 !.eslint*
 !.git*
 !.npm*
+
+package-lock.json
