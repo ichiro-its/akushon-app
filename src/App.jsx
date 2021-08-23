@@ -1,4 +1,3 @@
-/* eslint no-unused-vars: ["error", { "args": "none" }] */
 import React from "react";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
@@ -7,7 +6,6 @@ import MuiAppBar from "@material-ui/core/AppBar";
 import Grid from "@material-ui/core/Grid";
 import MuiToolbar from "@material-ui/core/Toolbar";
 import MuiTypography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
 
 import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
@@ -18,15 +16,7 @@ import ToggleOffIcon from "@material-ui/icons/ToggleOff";
 import IconButton from "@material-ui/core/IconButton";
 import { DataGrid } from "@material-ui/data-grid";
 import Input from "./components/Input";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  button: {
-    margin: theme.spacing(1),
-  },
-}));
+import "./App.css";
 
 const initActionData = [
   { id: 1, name: "action_1", next: 0 },
@@ -171,14 +161,13 @@ const jointRobotColumns = [
 ];
 
 function App() {
-  const classes = useStyles();
   const actionData = initActionData;
   const poseData = initPoseData;
   const jointPoseData = initJointPoseData;
   const jointRobotData = initJointRobotData;
 
   return (
-    <div className={classes.root}>
+    <div className="root">
       <MuiAppBar position="static">
         <MuiToolbar>
           <MuiTypography variant="h6">Akushon App</MuiTypography>
@@ -225,7 +214,7 @@ function App() {
                       variant="contained"
                       style={{ background: "#11cb5f" }}
                       color="primary"
-                      className={classes.button}
+                      className="button"
                       startIcon={<AddIcon />}
                     >
                       Add
@@ -233,7 +222,7 @@ function App() {
                     <Button
                       variant="contained"
                       color="default"
-                      className={classes.button}
+                      className="button"
                       startIcon={<ArrowUpwardIcon />}
                     >
                       Up
@@ -241,7 +230,7 @@ function App() {
                     <Button
                       variant="contained"
                       color="default"
-                      className={classes.button}
+                      className="button"
                       startIcon={<ArrowDownwardIcon />}
                     >
                       Down
@@ -281,13 +270,13 @@ function App() {
                 <Button
                   variant="contained"
                   color="default"
-                  className={classes.button}
+                  className="button"
                   startIcon={<ArrowBackIcon />}
                 />
                 <Button
                   variant="contained"
                   color="default"
-                  className={classes.button}
+                  className="button"
                   startIcon={<ArrowForwardIcon />}
                 />
                 <IconButton aria-label="torque">
