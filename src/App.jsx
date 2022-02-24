@@ -15,6 +15,14 @@ import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import ToggleOffIcon from "@material-ui/icons/ToggleOff";
 import IconButton from "@material-ui/core/IconButton";
 import { DataGrid } from "@material-ui/data-grid";
+import {
+  BridgeProvider,
+  BridgeConnection,
+  LoggerProvider,
+  SessionProvider,
+} from "kumo-app";
+
+import ClientActionTopic from "./components/ClientActionTopic";
 import Input from "./components/Input";
 import "./App.css";
 
@@ -168,138 +176,150 @@ function App() {
 
   return (
     <div className="root">
-      <MuiAppBar position="static">
-        <MuiToolbar>
-          <MuiTypography variant="h6">Akushon App</MuiTypography>
-        </MuiToolbar>
-      </MuiAppBar>
-      <Card>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={3}>
-              <div style={{ height: 640, width: "100%" }}>
-                <DataGrid
-                  rows={actionData}
-                  columns={actionColumns}
-                  rowHeight={32}
-                  disableColumnMenu
-                  rowsPerPageOptions={[]}
-                  // checkboxSelection
-                  // disableSelectionOnClick
-                />
-              </div>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <Card>
-                <CardContent>
-                  <MuiTypography variant="subtitle1">Action</MuiTypography>
-                  <div style={{ marginBottom: 10 }}>
-                    <Input id="action-name" label="Name" width="60%" />
-                    <Input id="action-next" label="Next" width="30%" />
-                  </div>
-                  <div style={{ height: 300, width: "100%" }}>
-                    <DataGrid
-                      rows={poseData}
-                      columns={poseColumns}
-                      rowHeight={32}
-                      disableColumnMenu
-                      rowsPerPageOptions={[]}
+      <LoggerProvider>
+        <BridgeProvider>
+          <BridgeConnection />
+          <SessionProvider>
+            <MuiAppBar position="static">
+              <MuiToolbar>
+                <MuiTypography variant="h6">Akushon App</MuiTypography>
+              </MuiToolbar>
+            </MuiAppBar>
+            <Card>
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6} lg={3}>
+                    <div style={{ height: 640, width: "100%" }}>
+                      <DataGrid
+                        rows={actionData}
+                        columns={actionColumns}
+                        rowHeight={32}
+                        disableColumnMenu
+                        rowsPerPageOptions={[]}
                       // checkboxSelection
                       // disableSelectionOnClick
-                    />
-                  </div>
+                      />
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <Card>
+                      <CardContent>
+                        <MuiTypography variant="subtitle1">
+                          Action
+                        </MuiTypography>
+                        <div style={{ marginBottom: 10 }}>
+                          <Input id="action-name" label="Name" width="60%" />
+                          <Input id="action-next" label="Next" width="30%" />
+                        </div>
+                        <div style={{ height: 300, width: "100%" }}>
+                          <DataGrid
+                            rows={poseData}
+                            columns={poseColumns}
+                            rowHeight={32}
+                            disableColumnMenu
+                            rowsPerPageOptions={[]}
+                          // checkboxSelection
+                          // disableSelectionOnClick
+                          />
+                        </div>
 
-                  <div style={{ marginTop: 10, marginBottom: -10 }}>
-                    <Button
-                      variant="contained"
-                      style={{ background: "#11cb5f" }}
-                      color="primary"
-                      className="button"
-                      startIcon={<AddIcon />}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="default"
-                      className="button"
-                      startIcon={<ArrowUpwardIcon />}
-                    >
-                      Up
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="default"
-                      className="button"
-                      startIcon={<ArrowDownwardIcon />}
-                    >
-                      Down
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card style={{ marginTop: 10 }}>
-                <CardContent>
-                  <MuiTypography variant="subtitle1">Pose</MuiTypography>
-                  <Input id="pose-name" label="Name" width="40%" />
-                  <Input id="pose-speed" label="Speed" width="25%" />
-                  <Input id="pose-pause" label="Pause" width="25%" />
-                </CardContent>
-              </Card>
-            </Grid>
+                        <div style={{ marginTop: 10, marginBottom: -10 }}>
+                          <Button
+                            variant="contained"
+                            style={{ background: "#11cb5f" }}
+                            color="primary"
+                            className="button"
+                            startIcon={<AddIcon />}
+                          >
+                            Add
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="default"
+                            className="button"
+                            startIcon={<ArrowUpwardIcon />}
+                          >
+                            Up
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="default"
+                            className="button"
+                            startIcon={<ArrowDownwardIcon />}
+                          >
+                            Down
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card style={{ marginTop: 10 }}>
+                      <CardContent>
+                        <MuiTypography variant="subtitle1">
+                          Pose
+                        </MuiTypography>
+                        <Input id="pose-name" label="Name" width="40%" />
+                        <Input id="pose-speed" label="Speed" width="25%" />
+                        <Input id="pose-pause" label="Pause" width="25%" />
+                      </CardContent>
+                    </Card>
+                  </Grid>
 
-            <Grid item xs={6} lg={2}>
-              <div style={{ height: 640, width: "100%" }}>
-                <DataGrid
-                  rows={jointPoseData}
-                  columns={jointPoseColumns}
-                  rowHeight={25}
-                  checkboxSelection
-                  disableColumnMenu
-                  rowsPerPageOptions={[]}
-                  // disableSelectionOnClick
-                />
-              </div>
-            </Grid>
-            <Grid item xs={6} lg={1}>
-              <div
-                style={{
-                  margin: "auto",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  color="default"
-                  className="button"
-                  startIcon={<ArrowBackIcon />}
-                />
-                <Button
-                  variant="contained"
-                  color="default"
-                  className="button"
-                  startIcon={<ArrowForwardIcon />}
-                />
-                <IconButton aria-label="torque">
-                  <ToggleOffIcon />
-                </IconButton>
-              </div>
-            </Grid>
-            <Grid item xs={6} lg={2}>
-              <div style={{ height: 640, width: "100%" }}>
-                <DataGrid
-                  rows={jointRobotData}
-                  columns={jointRobotColumns}
-                  rowHeight={25}
-                  checkboxSelection
-                  disableColumnMenu
-                  rowsPerPageOptions={[]}
-                  // disableSelectionOnClick
-                />
-              </div>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+                  <Grid item xs={6} lg={2}>
+                    <div style={{ height: 640, width: "100%" }}>
+                      <DataGrid
+                        rows={jointPoseData}
+                        columns={jointPoseColumns}
+                        rowHeight={25}
+                        checkboxSelection
+                        disableColumnMenu
+                        rowsPerPageOptions={[]}
+                      // disableSelectionOnClick
+                      />
+                    </div>
+                  </Grid>
+                  <Grid item xs={6} lg={1}>
+                    <div
+                      style={{
+                        margin: "auto",
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        color="default"
+                        className="button"
+                        startIcon={<ArrowBackIcon />}
+                      />
+                      <Button
+                        variant="contained"
+                        color="default"
+                        className="button"
+                        startIcon={<ArrowForwardIcon />}
+                      />
+                      <IconButton aria-label="torque">
+                        <ToggleOffIcon />
+                      </IconButton>
+                    </div>
+                  </Grid>
+                  <Grid item xs={6} lg={2}>
+                    <div style={{ height: 640, width: "100%" }}>
+                      <DataGrid
+                        rows={jointRobotData}
+                        columns={jointRobotColumns}
+                        rowHeight={25}
+                        checkboxSelection
+                        disableColumnMenu
+                        rowsPerPageOptions={[]}
+                      // disableSelectionOnClick
+                      />
+                    </div>
+                  </Grid>
+                </Grid>
+                <ClientActionTopic />
+              </CardContent>
+            </Card>
+          </SessionProvider>
+        </BridgeProvider>
+      </LoggerProvider>
     </div>
   );
 }
