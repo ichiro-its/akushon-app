@@ -30,13 +30,6 @@ import Input from "./Input";
 
 const actionColumns = [
   {
-    field: "id",
-    headerName: "#",
-    width: 15,
-    editable: true,
-    sortable: false,
-  },
-  {
     field: "name",
     headerName: "Name",
     width: 200,
@@ -91,31 +84,12 @@ const poseColumns = [
 ];
 
 const initJointRobotData = [
-  { id: 1, robot_pos: 0 },
-  { id: 2, robot_pos: 0 },
-  { id: 3, robot_pos: 0 },
-  { id: 4, robot_pos: 0 },
-  { id: 5, robot_pos: 0 },
-  { id: 6, robot_pos: 0 },
-  { id: 7, robot_pos: 0 },
-  { id: 8, robot_pos: 0 },
-  { id: 9, robot_pos: 0 },
-  { id: 10, robot_pos: 0 },
-  { id: 11, robot_pos: 0 },
-  { id: 12, robot_pos: 0 },
-  { id: 13, robot_pos: 0 },
-  { id: 14, robot_pos: 0 },
-  { id: 15, robot_pos: 0 },
-  { id: 16, robot_pos: 0 },
-  { id: 17, robot_pos: 0 },
-  { id: 18, robot_pos: 0 },
-  { id: 19, robot_pos: 0 },
-  { id: 20, robot_pos: 0 },
+  { id: 0, name: "left_shoulder", robot_pos: 0 },
+  { id: 1, name: "right_shoulder", robot_pos: 0 },
 ];
 
 const jointPoseColumns = [
-  { field: "id", headerName: "ID", width: 15, sortable: false },
-  { field: "name", headerName: "Name", width: 100, sortable: false },
+  { field: "name", headerName: "Name", width: 140, sortable: false },
   {
     field: "pose_pos",
     headerName: "Pose Pos",
@@ -127,7 +101,7 @@ const jointPoseColumns = [
 ];
 
 const jointRobotColumns = [
-  { field: "id", headerName: "ID", width: 15, sortable: false },
+  { field: "name", headerName: "Name", width: 140, sortable: false },
   {
     field: "robot_pos",
     headerName: "Robot Pos",
@@ -204,19 +178,19 @@ function ActionManagerForm() {
 
   const handleClickedPose = (event) => {
     setCurrentPose(posesData[event.row.id]);
+    setJointPoseData([]);
 
-    let idCounter = -1;
+    let idCounter = 100;
+    const currentJointPoseData = [];
     Object.keys(posesData[event.row.id].joints).forEach((key) => {
       idCounter += 1;
-      setJointPoseData((data) => [
-        ...data,
-        {
-          id: idCounter,
-          name: key,
-          pose_pos: posesData[event.row.id].joints[key],
-        },
-      ]);
+      currentJointPoseData.push({
+        id: idCounter,
+        name: key,
+        pose_pos: posesData[event.row.id].joints[key],
+      });
     });
+    setJointPoseData(currentJointPoseData);
   };
 
   return (
@@ -224,7 +198,7 @@ function ActionManagerForm() {
       <CardContent>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
-            <div style={{ height: 640, width: "100%" }}>
+            <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={actionsData}
                 columns={actionColumns}
@@ -323,7 +297,7 @@ function ActionManagerForm() {
           </Grid>
 
           <Grid item xs={6} lg={2}>
-            <div style={{ height: 640, width: "100%" }}>
+            <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={jointPoseData}
                 columns={jointPoseColumns}
@@ -359,7 +333,7 @@ function ActionManagerForm() {
             </div>
           </Grid>
           <Grid item xs={6} lg={2}>
-            <div style={{ height: 640, width: "100%" }}>
+            <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={jointRobotData}
                 columns={jointRobotColumns}
@@ -382,7 +356,7 @@ function ActionManagerForm() {
               disabled
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={1}>
             <Button
               onClick={handleCall}
               disabled={client === null || calling}
