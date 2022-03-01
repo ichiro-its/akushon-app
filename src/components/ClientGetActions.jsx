@@ -69,7 +69,7 @@ const poseColumns = [
   {
     field: "speed",
     headerName: "Speed",
-    width: 90,
+    width: 100,
     type: "number",
     editable: true,
     sortable: false,
@@ -77,34 +77,17 @@ const poseColumns = [
   {
     field: "pause",
     headerName: "Pause",
-    width: 90,
+    width: 100,
     type: "number",
     editable: true,
     sortable: false,
   },
-];
-
-const initJointPoseData = [
-  { id: 1, pose_pos: 0 },
-  { id: 2, pose_pos: 0 },
-  { id: 3, pose_pos: 0 },
-  { id: 4, pose_pos: 0 },
-  { id: 5, pose_pos: 0 },
-  { id: 6, pose_pos: 0 },
-  { id: 7, pose_pos: 0 },
-  { id: 8, pose_pos: 0 },
-  { id: 9, pose_pos: 0 },
-  { id: 10, pose_pos: 0 },
-  { id: 11, pose_pos: 0 },
-  { id: 12, pose_pos: 0 },
-  { id: 13, pose_pos: 0 },
-  { id: 14, pose_pos: 0 },
-  { id: 15, pose_pos: 0 },
-  { id: 16, pose_pos: 0 },
-  { id: 17, pose_pos: 0 },
-  { id: 18, pose_pos: 0 },
-  { id: 19, pose_pos: 0 },
-  { id: 20, pose_pos: 0 },
+  {
+    field: "joints",
+    headerName: "Joints",
+    editable: false,
+    sortable: false,
+  },
 ];
 
 const initJointRobotData = [
@@ -132,6 +115,7 @@ const initJointRobotData = [
 
 const jointPoseColumns = [
   { field: "id", headerName: "ID", width: 15, sortable: false },
+  { field: "name", headerName: "Name", width: 100, sortable: false },
   {
     field: "pose_pos",
     headerName: "Pose Pos",
@@ -155,7 +139,6 @@ const jointRobotColumns = [
 ];
 
 function ActionManagerForm() {
-  const jointPoseData = initJointPoseData;
   const jointRobotData = initJointRobotData;
 
   const client = useClient();
@@ -164,8 +147,10 @@ function ActionManagerForm() {
   const [test, setTest] = useState("");
   const [result, setResult] = useState("");
   const [actionsData, setActionsData] = useState([]);
-  const [poseData, setPoseData] = useState([]);
+  const [posesData, setPosesData] = useState([]);
+  const [jointPoseData, setJointPoseData] = useState([]);
   const [currentAction, setCurrentAction] = useState({});
+  const [currentPose, setCurrentPose] = useState({});
 
   const [calling, handleCall] = useHandleProcess(() => {
     setTest("request for actions list");
@@ -194,27 +179,44 @@ function ActionManagerForm() {
       });
   }, 500);
 
-  const handleClick = (event) => {
+  const handleClickedAction = (event) => {
     setCurrentAction(event.row);
 
     const currentPoses = actionsData[event.row.id].poses;
 
-    setPoseData([]);
+    setPosesData([]);
 
     for (let i = 0; i < currentPoses.length; i += 1) {
-      setPoseData((data) => [
+      setPosesData((data) => [
         ...data,
         {
           id: i,
           name: currentPoses[i].pose_name,
           speed: currentPoses[i].pose_speed,
           pause: currentPoses[i].pose_pause,
+          joints: currentPoses[i].pose_joints,
         },
       ]);
     }
 
     console.log(actionsData[event.row.id].poses);
-    console.log(currentAction.id);
+  };
+
+  const handleClickedPose = (event) => {
+    setCurrentPose(posesData[event.row.id]);
+
+    let idCounter = -1;
+    Object.keys(posesData[event.row.id].joints).forEach((key) => {
+      idCounter += 1;
+      setJointPoseData((data) => [
+        ...data,
+        {
+          id: idCounter,
+          name: key,
+          pose_pos: posesData[event.row.id].joints[key],
+        },
+      ]);
+    });
   };
 
   return (
@@ -229,7 +231,7 @@ function ActionManagerForm() {
                 rowHeight={32}
                 disableColumnMenu
                 rowsPerPageOptions={[]}
-                onRowClick={handleClick}
+                onRowClick={handleClickedAction}
                 // checkboxSelection
                 // disableSelectionOnClick
               />
@@ -240,16 +242,27 @@ function ActionManagerForm() {
               <CardContent>
                 <MuiTypography variant="subtitle1">Action</MuiTypography>
                 <div style={{ marginBottom: 10 }}>
-                  <Input id="action-name" label="Name" width="60%" value={currentAction ? currentAction.name : ''}/>
-                  <Input id="action-next" label="Next" width="30%" value={currentAction ? currentAction.next : ''}/>
+                  <Input
+                    id="action-name"
+                    label="Name"
+                    width="60%"
+                    value={currentAction ? currentAction.name : ""}
+                  />
+                  <Input
+                    id="action-next"
+                    label="Next"
+                    width="30%"
+                    value={currentAction ? currentAction.next : ""}
+                  />
                 </div>
                 <div style={{ height: 300, width: "100%" }}>
                   <DataGrid
-                    rows={poseData}
+                    rows={posesData}
                     columns={poseColumns}
                     rowHeight={32}
                     disableColumnMenu
                     rowsPerPageOptions={[]}
+                    onRowClick={handleClickedPose}
                     // checkboxSelection
                     // disableSelectionOnClick
                   />
@@ -287,9 +300,24 @@ function ActionManagerForm() {
             <Card style={{ marginTop: 10 }}>
               <CardContent>
                 <MuiTypography variant="subtitle1">Pose</MuiTypography>
-                <Input id="pose-name" label="Name" width="40%" />
-                <Input id="pose-speed" label="Speed" width="25%" />
-                <Input id="pose-pause" label="Pause" width="25%" />
+                <Input
+                  id="pose-name"
+                  label="Name"
+                  width="40%"
+                  value={currentPose ? currentPose.name : ""}
+                />
+                <Input
+                  id="pose-speed"
+                  label="Speed"
+                  width="25%"
+                  value={currentPose ? currentPose.speed : ""}
+                />
+                <Input
+                  id="pose-pause"
+                  label="Pause"
+                  width="25%"
+                  value={currentPose ? currentPose.pause : ""}
+                />
               </CardContent>
             </Card>
           </Grid>
@@ -300,9 +328,9 @@ function ActionManagerForm() {
                 rows={jointPoseData}
                 columns={jointPoseColumns}
                 rowHeight={25}
-                checkboxSelection
                 disableColumnMenu
                 rowsPerPageOptions={[]}
+                // checkboxSelection
                 // disableSelectionOnClick
               />
             </div>
@@ -336,7 +364,7 @@ function ActionManagerForm() {
                 rows={jointRobotData}
                 columns={jointRobotColumns}
                 rowHeight={25}
-                checkboxSelection
+                // checkboxSelection
                 disableColumnMenu
                 rowsPerPageOptions={[]}
                 // disableSelectionOnClick
