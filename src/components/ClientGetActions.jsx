@@ -176,7 +176,7 @@ function ActionManagerForm() {
       .then((response) => {
         const actionsData = JSON.parse(`${response.json}`);
 
-        let idCounter = 2;
+        let idCounter = 0;
         Object.keys(actionsData).forEach((key) => {
           idCounter += 1;
           setActionData((data) => [
@@ -188,7 +188,7 @@ function ActionManagerForm() {
             },
           ]);
         });
-        setResult(actionsData.action_left_kick.name + String(idCounter));
+        setResult(actionsData.action_left_kick.name);
       })
       .catch((err) => {
         logger.error(`Failed to call data! ${err.message}.`);
