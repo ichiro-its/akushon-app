@@ -39,16 +39,23 @@ const actionColumns = [
   {
     field: "name",
     headerName: "Name",
-    width: 170,
+    width: 200,
     editable: true,
     sortable: false,
   },
   {
     field: "next",
     headerName: "Next",
-    width: 90,
+    width: 140,
     type: "number",
     editable: true,
+    sortable: false,
+  },
+  {
+    field: "poses",
+    headerName: "Poses",
+    width: 0,
+    editable: false,
     sortable: false,
   },
 ];
@@ -158,7 +165,6 @@ const jointRobotColumns = [
 ];
 
 function ActionManagerForm() {
-  const poseData = initPoseData;
   const jointPoseData = initJointPoseData;
   const jointRobotData = initJointRobotData;
 
@@ -168,6 +174,8 @@ function ActionManagerForm() {
   const [test, setTest] = useState("");
   const [result, setResult] = useState("");
   const [actionData, setActionData] = useState([]);
+  const [poseData, setPoseData] = useState([]);
+  const [currentAction, setCurrentAction] = useState({});
 
   const [calling, handleCall] = useHandleProcess(() => {
     setTest("request for actions list");
@@ -176,7 +184,7 @@ function ActionManagerForm() {
       .then((response) => {
         const actionsData = JSON.parse(`${response.json}`);
 
-        let idCounter = 0;
+        let idCounter = -1;
         Object.keys(actionsData).forEach((key) => {
           idCounter += 1;
           setActionData((data) => [
@@ -185,15 +193,25 @@ function ActionManagerForm() {
               id: idCounter,
               name: actionsData[key].name,
               next: actionsData[key].next_action,
+              poses: actionsData[key].poses,
             },
           ]);
         });
-        setResult(actionsData.action_left_kick.name);
+        setResult(`${response.json}`);
       })
       .catch((err) => {
         logger.error(`Failed to call data! ${err.message}.`);
       });
   }, 500);
+
+  const handleClick = (event) => {
+    setCurrentAction(event.row);
+    setPoseData(initPoseData);
+
+    console.log(actionData[event.row.id].poses);
+    console.log(currentAction.id);
+    // setResult(currentAction);
+  };
 
   return (
     <Card>
@@ -207,6 +225,7 @@ function ActionManagerForm() {
                 rowHeight={32}
                 disableColumnMenu
                 rowsPerPageOptions={[]}
+                onRowClick={handleClick}
                 // checkboxSelection
                 // disableSelectionOnClick
               />
