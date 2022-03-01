@@ -46,40 +46,30 @@ const actionColumns = [
   {
     field: "next",
     headerName: "Next",
-    width: 140,
-    type: "number",
+    width: 180,
     editable: true,
     sortable: false,
   },
   {
     field: "poses",
     headerName: "Poses",
-    width: 0,
     editable: false,
     sortable: false,
   },
-];
-
-const initPoseData = [
-  { id: 1, name: "pose_1", speed: 0.5, pause: 1.5 },
-  { id: 2, name: "pose_2", speed: 0.5, pause: 1.5 },
-  { id: 3, name: "pose_3", speed: 0.5, pause: 1.5 },
-  { id: 4, name: "pose_4", speed: 0.5, pause: 1.5 },
-  { id: 5, name: "pose_5", speed: 0.5, pause: 1.5 },
 ];
 
 const poseColumns = [
   {
     field: "name",
     headerName: "Name",
-    width: 125,
+    width: 140,
     editable: true,
     sortable: false,
   },
   {
     field: "speed",
     headerName: "Speed",
-    width: 125,
+    width: 90,
     type: "number",
     editable: true,
     sortable: false,
@@ -87,7 +77,7 @@ const poseColumns = [
   {
     field: "pause",
     headerName: "Pause",
-    width: 125,
+    width: 90,
     type: "number",
     editable: true,
     sortable: false,
@@ -173,7 +163,7 @@ function ActionManagerForm() {
 
   const [test, setTest] = useState("");
   const [result, setResult] = useState("");
-  const [actionData, setActionData] = useState([]);
+  const [actionsData, setActionsData] = useState([]);
   const [poseData, setPoseData] = useState([]);
   const [currentAction, setCurrentAction] = useState({});
 
@@ -182,18 +172,18 @@ function ActionManagerForm() {
     return client
       .call({ test })
       .then((response) => {
-        const actionsData = JSON.parse(`${response.json}`);
+        const rawActionsData = JSON.parse(`${response.json}`);
 
         let idCounter = -1;
-        Object.keys(actionsData).forEach((key) => {
+        Object.keys(rawActionsData).forEach((key) => {
           idCounter += 1;
-          setActionData((data) => [
+          setActionsData((data) => [
             ...data,
             {
               id: idCounter,
-              name: actionsData[key].name,
-              next: actionsData[key].next_action,
-              poses: actionsData[key].poses,
+              name: rawActionsData[key].name,
+              next: rawActionsData[key].next_action,
+              poses: rawActionsData[key].poses,
             },
           ]);
         });
@@ -206,11 +196,25 @@ function ActionManagerForm() {
 
   const handleClick = (event) => {
     setCurrentAction(event.row);
-    setPoseData(initPoseData);
 
-    console.log(actionData[event.row.id].poses);
+    const currentPoses = actionsData[event.row.id].poses;
+
+    setPoseData([]);
+
+    for (let i = 0; i < currentPoses.length; i += 1) {
+      setPoseData((data) => [
+        ...data,
+        {
+          id: i,
+          name: currentPoses[i].pose_name,
+          speed: currentPoses[i].pose_speed,
+          pause: currentPoses[i].pose_pause,
+        },
+      ]);
+    }
+
+    console.log(actionsData[event.row.id].poses);
     console.log(currentAction.id);
-    // setResult(currentAction);
   };
 
   return (
@@ -220,7 +224,7 @@ function ActionManagerForm() {
           <Grid item xs={12} md={6} lg={3}>
             <div style={{ height: 640, width: "100%" }}>
               <DataGrid
-                rows={actionData}
+                rows={actionsData}
                 columns={actionColumns}
                 rowHeight={32}
                 disableColumnMenu
@@ -236,8 +240,8 @@ function ActionManagerForm() {
               <CardContent>
                 <MuiTypography variant="subtitle1">Action</MuiTypography>
                 <div style={{ marginBottom: 10 }}>
-                  <Input id="action-name" label="Name" width="60%" />
-                  <Input id="action-next" label="Next" width="30%" />
+                  <Input id="action-name" label="Name" width="60%" value={currentAction ? currentAction.name : ''}/>
+                  <Input id="action-next" label="Next" width="30%" value={currentAction ? currentAction.next : ''}/>
                 </div>
                 <div style={{ height: 300, width: "100%" }}>
                   <DataGrid
