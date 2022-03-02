@@ -26,27 +26,22 @@ import {
 
 import React, { useState } from "react";
 
-import Input from "./Input";
-
 const actionColumns = [
   {
     field: "name",
     headerName: "Name",
     width: 200,
-    editable: true,
     sortable: false,
   },
   {
     field: "next",
     headerName: "Next",
     width: 180,
-    editable: true,
     sortable: false,
   },
   {
     field: "poses",
     headerName: "Poses",
-    editable: false,
     sortable: false,
   },
 ];
@@ -56,7 +51,6 @@ const poseColumns = [
     field: "name",
     headerName: "Name",
     width: 140,
-    editable: true,
     sortable: false,
   },
   {
@@ -64,7 +58,6 @@ const poseColumns = [
     headerName: "Speed",
     width: 100,
     type: "number",
-    editable: true,
     sortable: false,
   },
   {
@@ -72,13 +65,11 @@ const poseColumns = [
     headerName: "Pause",
     width: 100,
     type: "number",
-    editable: true,
     sortable: false,
   },
   {
     field: "joints",
     headerName: "Joints",
-    editable: false,
     sortable: false,
   },
 ];
@@ -198,7 +189,7 @@ function ActionManagerForm() {
       <CardContent>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
-            <div style={{ height: 680, width: "100%" }}>
+            <div style={{ height: 640, width: "100%" }}>
               <DataGrid
                 rows={actionsData}
                 columns={actionColumns}
@@ -210,23 +201,44 @@ function ActionManagerForm() {
                 // disableSelectionOnClick
               />
             </div>
+            <div style={{ marginTop: 10 }}>
+              <Button
+                variant="contained"
+                style={{ background: "#11cb5f" }}
+                color="primary"
+                className="button"
+                startIcon={<AddIcon />}
+              >
+                Add Action
+              </Button>
+            </div>
           </Grid>
           <Grid item xs={12} md={6} lg={4}>
             <Card>
               <CardContent>
                 <MuiTypography variant="subtitle1">Action</MuiTypography>
                 <div style={{ marginBottom: 10 }}>
-                  <Input
+                  <TextField
                     id="action-name"
                     label="Name"
-                    width="60%"
+                    variant="outlined"
+                    margin="dense"
                     value={currentAction ? currentAction.name : ""}
+                    style={{ margin: 3, marginTop: 20, width: "60%" }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
                   />
-                  <Input
+                  <TextField
                     id="action-next"
                     label="Next"
-                    width="30%"
+                    variant="outlined"
+                    margin="dense"
                     value={currentAction ? currentAction.next : ""}
+                    style={{ margin: 3, marginTop: 20, width: "30%" }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
                   />
                 </div>
                 <div style={{ height: 300, width: "100%" }}>
@@ -250,9 +262,10 @@ function ActionManagerForm() {
                     className="button"
                     startIcon={<AddIcon />}
                   >
-                    Add
+                    Add Pose
                   </Button>
                   <Button
+                    style={{ marginLeft: 8 }}
                     variant="contained"
                     color="default"
                     className="button"
@@ -261,6 +274,7 @@ function ActionManagerForm() {
                     Up
                   </Button>
                   <Button
+                    style={{ marginLeft: 8 }}
                     variant="contained"
                     color="default"
                     className="button"
@@ -274,23 +288,38 @@ function ActionManagerForm() {
             <Card style={{ marginTop: 10 }}>
               <CardContent>
                 <MuiTypography variant="subtitle1">Pose</MuiTypography>
-                <Input
+                <TextField
                   id="pose-name"
                   label="Name"
-                  width="40%"
+                  variant="outlined"
+                  margin="dense"
                   value={currentPose ? currentPose.name : ""}
+                  style={{ margin: 3, marginTop: 20, width: "40%" }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
-                <Input
+                <TextField
                   id="pose-speed"
                   label="Speed"
-                  width="25%"
+                  variant="outlined"
+                  margin="dense"
                   value={currentPose ? currentPose.speed : ""}
+                  style={{ margin: 3, marginTop: 20, width: "25%" }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
-                <Input
+                <TextField
                   id="pose-pause"
                   label="Pause"
-                  width="25%"
-                  value={currentPose ? currentPose.pause : ""}
+                  variant="outlined"
+                  margin="dense"
+                  value={currentPose ? currentPose.speed : ""}
+                  style={{ margin: 3, marginTop: 20, width: "25%" }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
               </CardContent>
             </Card>
@@ -312,7 +341,8 @@ function ActionManagerForm() {
           <Grid item xs={6} lg={1}>
             <div
               style={{
-                margin: "auto",
+                paddingTop: "50%",
+                alignItems: "center",
               }}
             >
               <Button
@@ -327,6 +357,15 @@ function ActionManagerForm() {
                 className="button"
                 startIcon={<ArrowForwardIcon />}
               />
+              {/* <ToggleButton
+                value="check"
+                // selected={selected}
+                // onChange={() => {
+                //   setSelected(!selected);
+                // }}
+              >
+                <CheckIcon />
+              </ToggleButton> */}
               <IconButton aria-label="torque">
                 <ToggleOffIcon />
               </IconButton>
@@ -346,7 +385,7 @@ function ActionManagerForm() {
             </div>
           </Grid>
         </Grid>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} style={{ marginTop: 20 }}>
           <Grid item xs={12}>
             <TextField
               label="Response"
@@ -356,7 +395,7 @@ function ActionManagerForm() {
               disabled
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={12}>
             <Button
               onClick={handleCall}
               disabled={client === null || calling}
