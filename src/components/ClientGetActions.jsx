@@ -184,6 +184,20 @@ function ActionManagerForm() {
     setJointPoseData(currentJointPoseData);
   };
 
+  const updatePosesData = (newPose) => {
+    const newPosesData = [];
+    for (let i = 0; i < posesData.length; i += 1) {
+      if (i === newPose.id) {
+        newPosesData.push(newPose);
+      } 
+      else {
+        newPosesData.push(posesData[i]);
+      }
+    }
+    setPosesData(newPosesData);
+    // console.log(posesData[newPose.id]);
+  };
+
   return (
     <Card>
       <CardContent>
@@ -294,6 +308,17 @@ function ActionManagerForm() {
                   variant="outlined"
                   margin="dense"
                   value={currentPose ? currentPose.name : ""}
+                  onChange={(event) => {
+                    const newPose = {
+                      id: currentPose.id,
+                      name: event.target.value,
+                      speed: currentPose.speed,
+                      pause: currentPose.pause,
+                      joints: currentPose.joints,
+                    };
+                    setCurrentPose(newPose);
+                    updatePosesData(newPose);
+                  }}
                   style={{ margin: 3, marginTop: 20, width: "40%" }}
                   InputLabelProps={{
                     shrink: true,
@@ -305,6 +330,15 @@ function ActionManagerForm() {
                   variant="outlined"
                   margin="dense"
                   value={currentPose ? currentPose.speed : ""}
+                  onChange={(event) => {
+                    setCurrentPose({
+                      id: currentPose.id,
+                      name: currentPose.name,
+                      speed: event.target.value,
+                      pause: currentPose.pause,
+                      joints: currentPose.joints,
+                    });
+                  }}
                   style={{ margin: 3, marginTop: 20, width: "25%" }}
                   InputLabelProps={{
                     shrink: true,
@@ -315,7 +349,16 @@ function ActionManagerForm() {
                   label="Pause"
                   variant="outlined"
                   margin="dense"
-                  value={currentPose ? currentPose.speed : ""}
+                  value={currentPose ? currentPose.pause : ""}
+                  onChange={(event) => {
+                    setCurrentPose({
+                      id: currentPose.id,
+                      name: currentPose.name,
+                      speed: currentPose.speed,
+                      pause: event.target.value,
+                      joints: currentPose.joints,
+                    });
+                  }}
                   style={{ margin: 3, marginTop: 20, width: "25%" }}
                   InputLabelProps={{
                     shrink: true,
