@@ -185,16 +185,7 @@ function ActionManagerForm() {
   };
 
   const updatePosesData = (newPose) => {
-    const newPosesData = [];
-    for (let i = 0; i < posesData.length; i += 1) {
-      if (i === newPose.id) {
-        newPosesData.push(newPose);
-      } 
-      else {
-        newPosesData.push(posesData[i]);
-      }
-    }
-    setPosesData(newPosesData);
+    setPosesData([...posesData.slice(0, newPose.id), newPose, ...posesData.slice(newPose.id + 1)]);
     // console.log(posesData[newPose.id]);
   };
 
