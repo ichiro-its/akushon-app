@@ -177,6 +177,16 @@ function ActionManagerForm() {
     setJointPoseData(currentJointPoseData);
   };
 
+  const updateActionsData = (newAction) => {
+    setCurrentAction(newAction);
+    const newActionsData = [
+      ...actionsData.slice(0, newAction.id),
+      newAction,
+      ...actionsData.slice(newAction.id + 1),
+    ];
+    setActionsData(newActionsData);
+  };
+
   const updatePosesData = (newPose) => {
     setCurrentPose(newPose);
     const newPosesData = [
@@ -193,16 +203,6 @@ function ActionManagerForm() {
       poses: newPosesData,
     };
     updateActionsData(newAction);
-  };
-
-  const updateActionsData = (newAction) => {
-    setCurrentAction(newAction);
-    const newActionsData = [
-      ...actionsData.slice(0, newAction.id),
-      newAction,
-      ...actionsData.slice(newAction.id + 1),
-    ];
-    setActionsData(newActionsData);
   };
 
   return (
