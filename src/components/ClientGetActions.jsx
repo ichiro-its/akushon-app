@@ -127,13 +127,36 @@ function ActionManagerForm() {
         let idCounter = -1;
         Object.keys(rawActionsData).forEach((key) => {
           idCounter += 1;
+          
+          const poses = [];
+          const rawPoses = rawActionsData[key].poses;
+          for (let i = 0; i < rawPoses.length; i += 1) {
+            let idJointCounter = -1;
+            const jointsData = [];
+            Object.keys(rawPoses[i].joints).forEach((key) => {
+              idJointCounter += 1;
+              jointsData.push({
+                id: idJointCounter,
+                name: key,
+                pose_pos: rawPoses[i].joints[key],
+              });
+            });
+  
+            poses.push({
+              id: i,
+              name: rawPoses[i].name,
+              speed: rawPoses[i].speed,
+              pause: rawPoses[i].pause,
+              joints: jointsData,
+            });
+          }
           setActionsData((data) => [
             ...data,
             {
               id: idCounter,
               name: rawActionsData[key].name,
               next: rawActionsData[key].next_action,
-              poses: rawActionsData[key].poses,
+              poses: poses,
             },
           ]);
         });
@@ -146,34 +169,27 @@ function ActionManagerForm() {
 
   const handleClickedAction = (event) => {
     setCurrentAction(event.row);
-
-    const newPosesData = [];
-    for (let i = 0; i < actionsData[event.row.id].poses.length; i += 1) {
-      newPosesData.push({
-        id: i,
-        name: actionsData[event.row.id].poses[i].name,
-        speed: actionsData[event.row.id].poses[i].speed,
-        pause: actionsData[event.row.id].poses[i].pause,
-        joints: actionsData[event.row.id].poses[i].joints,
-      });
-    }
-    setPosesData(newPosesData);
+    const currentPoses = actionsData[event.row.id].poses;
+    setPosesData(currentPoses);
+    setJointPoseData([]);
   };
 
   const handleClickedPose = (event) => {
     setCurrentPose(posesData[event.row.id]);
     setJointPoseData([]);
-
-    let idCounter = 100;
+    
+    const currentPoses = posesData[event.row.id];
+    
     const currentJointPoseData = [];
-    Object.keys(posesData[event.row.id].joints).forEach((key) => {
-      idCounter += 1;
+    for (let i = 0; i < currentPoses.joints.length; i += 1) {
+      // console.log(currentPoses.joints[i]);
       currentJointPoseData.push({
-        id: idCounter,
-        name: key,
-        pose_pos: posesData[event.row.id].joints[key],
+        id: i,
+        name: currentPoses.joints[i].name,
+        pose_pos: currentPoses.joints[i].pose_pos,
       });
-    });
+    }
+    console.log("hahaha");
     setJointPoseData(currentJointPoseData);
   };
 
@@ -205,6 +221,24 @@ function ActionManagerForm() {
     updateActionsData(newAction);
   };
 
+  const updateJointPoseData = (newJoints) => {
+    const newJointPoseData = [
+      ...jointPoseData.slice(0, newJoints.id),
+      newJoints,
+      ...jointPoseData.slice(newJoints.id + 1),
+    ];
+    setJointPoseData(newJointPoseData);
+    
+    const newPose = {
+      id: currentPose.id,
+      name: currentPose.name,
+      speed: currentPose.speed,
+      pause: currentPose.pause,
+      joints: newJointPoseData,
+    };
+    updatePosesData(newPose);
+  };
+
   return (
     <Card>
       <CardContent>
@@ -218,8 +252,6 @@ function ActionManagerForm() {
                 disableColumnMenu
                 rowsPerPageOptions={[]}
                 onRowClick={handleClickedAction}
-                // checkboxSelection
-                // disableSelectionOnClick
               />
             </div>
             <div style={{ marginTop: 10 }}>
@@ -288,8 +320,6 @@ function ActionManagerForm() {
                     disableColumnMenu
                     rowsPerPageOptions={[]}
                     onRowClick={handleClickedPose}
-                    // checkboxSelection
-                    // disableSelectionOnClick
                   />
                 </div>
 
@@ -400,10 +430,17 @@ function ActionManagerForm() {
                 rows={jointPoseData}
                 columns={jointPoseColumns}
                 rowHeight={25}
+                onCellEditCommit={(event) => {
+                  const newJoints = {
+                    id: jointPoseData[event.id].id,
+                    name: jointPoseData[event.id].name,
+                    pose_pos: event.value,
+                  };
+                  console.log(newJoints);
+                  updateJointPoseData(newJoints);
+                }}
                 disableColumnMenu
                 rowsPerPageOptions={[]}
-                // checkboxSelection
-                // disableSelectionOnClick
               />
             </div>
           </Grid>
@@ -426,15 +463,6 @@ function ActionManagerForm() {
                 className="button"
                 startIcon={<ArrowForwardIcon />}
               />
-              {/* <ToggleButton
-                value="check"
-                // selected={selected}
-                // onChange={() => {
-                //   setSelected(!selected);
-                // }}
-              >
-                <CheckIcon />
-              </ToggleButton> */}
               <IconButton aria-label="torque">
                 <ToggleOffIcon />
               </IconButton>
@@ -446,10 +474,8 @@ function ActionManagerForm() {
                 rows={jointRobotData}
                 columns={jointRobotColumns}
                 rowHeight={25}
-                // checkboxSelection
                 disableColumnMenu
                 rowsPerPageOptions={[]}
-                // disableSelectionOnClick
               />
             </div>
           </Grid>
