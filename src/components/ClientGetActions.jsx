@@ -82,7 +82,7 @@ const initJointRobotData = [
 const jointPoseColumns = [
   { field: "name", headerName: "Name", width: 140, sortable: false },
   {
-    field: "pose_pos",
+    field:  "pose_pos",
     headerName: "Pose Pos",
     width: 100,
     type: "number",
@@ -145,29 +145,27 @@ function ActionManagerForm() {
   }, 500);
 
   const handleClickedAction = (event) => {
+    console.log(actionsData);
     setCurrentAction(event.row);
 
-    const currentPoses = actionsData[event.row.id].poses;
-
-    setPosesData([]);
-
-    for (let i = 0; i < currentPoses.length; i += 1) {
-      setPosesData((data) => [
-        ...data,
-        {
-          id: i,
-          name: currentPoses[i].pose_name,
-          speed: currentPoses[i].pose_speed,
-          pause: currentPoses[i].pose_pause,
-          joints: currentPoses[i].pose_joints,
-        },
-      ]);
+    const newPosesData = [];
+    for (let i = 0; i < actionsData[event.row.id].poses.length; i += 1) {
+      newPosesData.push({
+        id: i,
+        name: actionsData[event.row.id].poses[i].name,
+        speed: actionsData[event.row.id].poses[i].speed,
+        pause: actionsData[event.row.id].poses[i].pause,
+        joints: actionsData[event.row.id].poses[i].joints,
+      });
     }
+    setPosesData(newPosesData);
 
-    console.log(actionsData[event.row.id].poses);
+    console.log(posesData);
+    console.log(newPosesData);
   };
 
   const handleClickedPose = (event) => {
+    // console.log(posesData);
     setCurrentPose(posesData[event.row.id]);
     setJointPoseData([]);
 
@@ -185,8 +183,27 @@ function ActionManagerForm() {
   };
 
   const updatePosesData = (newPose) => {
-    setPosesData([...posesData.slice(0, newPose.id), newPose, ...posesData.slice(newPose.id + 1)]);
-    // console.log(posesData[newPose.id]);
+    const newPosesData = [
+      ...posesData.slice(0, newPose.id),
+      newPose,
+      ...posesData.slice(newPose.id + 1),
+    ];
+    setPosesData(newPosesData);
+
+    const newAction = {
+      id: currentAction.id,
+      name: currentAction.name,
+      next: currentAction.next,
+      poses: newPosesData,
+    };
+    setCurrentAction(newAction);
+
+    const newActionsData = [
+      ...actionsData.slice(0, newAction.id),
+      newAction,
+      ...actionsData.slice(newAction.id + 1),
+    ];
+    setActionsData(newActionsData);
   };
 
   return (
