@@ -19,9 +19,11 @@ import {
 import {
   ClientProvider,
   NodeProvider,
+  PublisherProvider,
   useClient,
   useHandleProcess,
   useLogger,
+  usePublisher,
 } from "kumo-app";
 
 import React, { useState } from "react";
@@ -103,6 +105,8 @@ const jointRobotColumns = [
   },
 ];
 
+let rawActionsDataGlobal = [];
+
 function ActionManagerForm() {
   const jointRobotData = initJointRobotData;
 
@@ -122,27 +126,26 @@ function ActionManagerForm() {
     return client
       .call({ test })
       .then((response) => {
-        const rawActionsData = JSON.parse(`${response.json}`);
+        const jsonActionsData = JSON.parse(`${response.json}`);
 
         let idCounter = -1;
-        Object.keys(rawActionsData).forEach((key) => {
+        const rawActions = [];
+        Object.keys(jsonActionsData).forEach((key) => {
           idCounter += 1;
-          
-          const poses = [];
-          const rawPoses = rawActionsData[key].poses;
+          const fixedPoses = [];
+          const rawPoses = jsonActionsData[key].poses;
           for (let i = 0; i < rawPoses.length; i += 1) {
             let idJointCounter = -1;
             const jointsData = [];
-            Object.keys(rawPoses[i].joints).forEach((key) => {
+            Object.keys(rawPoses[i].joints).forEach((index) => {
               idJointCounter += 1;
               jointsData.push({
                 id: idJointCounter,
-                name: key,
-                pose_pos: rawPoses[i].joints[key],
+                name: index,
+                pose_pos: rawPoses[i].joints[index],
               });
             });
-  
-            poses.push({
+            fixedPoses.push({
               id: i,
               name: rawPoses[i].name,
               speed: rawPoses[i].speed,
@@ -150,16 +153,15 @@ function ActionManagerForm() {
               joints: jointsData,
             });
           }
-          setActionsData((data) => [
-            ...data,
-            {
-              id: idCounter,
-              name: rawActionsData[key].name,
-              next: rawActionsData[key].next_action,
-              poses: poses,
-            },
-          ]);
+          rawActions.push({
+            id: idCounter,
+            name: jsonActionsData[key].name,
+            next: jsonActionsData[key].next_action,
+            poses: fixedPoses,
+          });
         });
+        setActionsData(rawActions);
+        rawActionsDataGlobal = rawActions;
         setResult(`${response.json}`);
       })
       .catch((err) => {
@@ -177,12 +179,11 @@ function ActionManagerForm() {
   const handleClickedPose = (event) => {
     setCurrentPose(posesData[event.row.id]);
     setJointPoseData([]);
-    
+
     const currentPoses = posesData[event.row.id];
-    
+
     const currentJointPoseData = [];
     for (let i = 0; i < currentPoses.joints.length; i += 1) {
-      // console.log(currentPoses.joints[i]);
       currentJointPoseData.push({
         id: i,
         name: currentPoses.joints[i].name,
@@ -201,6 +202,7 @@ function ActionManagerForm() {
       ...actionsData.slice(newAction.id + 1),
     ];
     setActionsData(newActionsData);
+    rawActionsDataGlobal = newActionsData;
   };
 
   const updatePosesData = (newPose) => {
@@ -228,7 +230,7 @@ function ActionManagerForm() {
       ...jointPoseData.slice(newJoints.id + 1),
     ];
     setJointPoseData(newJointPoseData);
-    
+
     const newPose = {
       id: currentPose.id,
       name: currentPose.name,
@@ -507,15 +509,57 @@ function ActionManagerForm() {
   );
 }
 
+function PublishForm() {
+  const publisher = usePublisher();
+  const logger = useLogger();
+
+  const [publishing, handlePublish] = useHandleProcess(() => {
+    const json = JSON.stringify(rawActionsDataGlobal);
+    return publisher
+      .publish({ json })
+      .then(() => {
+        console.log(json);
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish data! ${err.message}.`);
+      });
+  }, 500);
+
+  return (
+    <Card>
+      <CardContent>
+        <Grid item xs={12}>
+          <Button
+            onClick={handlePublish}
+            style={{ background: "#11cb5f" }}
+            disabled={publisher == null || publishing}
+            color="primary"
+            variant="contained"
+            fullWidth
+          >
+            {publishing ? <CircularProgress size={24} /> : "Save"}
+          </Button>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ClientGetActions() {
   return (
-    <NodeProvider nodeName="action_client">
+    <NodeProvider nodeName="akushon_app">
       <ClientProvider
-        serviceType="akushon_interfaces/srv/Action"
+        serviceType="akushon_interfaces/srv/GetActions"
         serviceName="/get_actions"
       >
         <ActionManagerForm />
       </ClientProvider>
+      <PublisherProvider
+        messageType="akushon_interfaces/msg/SaveActions"
+        topicName="/save_actions"
+      >
+        <PublishForm />
+      </PublisherProvider>
     </NodeProvider>
   );
 }
