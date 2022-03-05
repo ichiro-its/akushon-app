@@ -170,7 +170,7 @@ function ActionManagerForm() {
             name: jsonActionsData[key].name,
             start_delay: jsonActionsData[key].start_delay,
             stop_delay: jsonActionsData[key].stop_delay,
-            next: jsonActionsData[key].next_action,
+            next: jsonActionsData[key].next,
             poses: fixedPoses,
           });
         });
@@ -526,7 +526,7 @@ function PublishForm() {
 
   const [publishing, handlePublish] = useHandleProcess(() => {
     const jsonActionsData = rawActionsDataGlobal;
-    const rawActions = [];
+    const rawActions = {};
     Object.keys(jsonActionsData).forEach((key) => {
       const fixedPoses = [];
       const rawPoses = jsonActionsData[key].poses;
@@ -543,13 +543,14 @@ function PublishForm() {
           joints: jointsData,
         });
       }
-      rawActions.push({
+      const action = {
         name: jsonActionsData[key].name,
         next: jsonActionsData[key].next,
         start_delay: jsonActionsData[key].start_delay,
         stop_delay: jsonActionsData[key].stop_delay,
         poses: fixedPoses,
-      });
+      };
+      rawActions[jsonActionsData[key].name.toLowerCase()] = action;
     });
     const json = JSON.stringify(rawActions);
     return publisher
