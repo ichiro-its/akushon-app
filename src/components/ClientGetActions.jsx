@@ -32,13 +32,25 @@ const actionColumns = [
   {
     field: "name",
     headerName: "Name",
-    width: 200,
+    width: 125,
     sortable: false,
   },
   {
     field: "next",
     headerName: "Next",
-    width: 180,
+    width: 90,
+    sortable: false,
+  },
+  {
+    field: "start_delay",
+    headerName: "Start Delay",
+    width: 60,
+    sortable: false,
+  },
+  {
+    field: "stop_delay",
+    headerName: "Stop Delay",
+    width: 60,
     sortable: false,
   },
   {
@@ -121,10 +133,11 @@ function ActionManagerForm() {
   const [currentPose, setCurrentPose] = useState({});
 
   const [calling, handleCall] = useHandleProcess(() => {
-    setTest("request for actions list");
+    setTest("Request for actions list");
     return client
       .call({ test })
       .then((response) => {
+        logger.success(`Successfully get actions data`);
         const jsonActionsData = JSON.parse(`${response.json}`);
 
         let idCounter = -1;
@@ -155,6 +168,8 @@ function ActionManagerForm() {
           rawActions.push({
             id: idCounter,
             name: jsonActionsData[key].name,
+            start_delay: jsonActionsData[key].start_delay,
+            stop_delay: jsonActionsData[key].stop_delay,
             next: jsonActionsData[key].next_action,
             poses: fixedPoses,
           });
@@ -215,6 +230,8 @@ function ActionManagerForm() {
       id: currentAction.id,
       name: currentAction.name,
       next: currentAction.next,
+      start_delay: currentAction.start_delay,
+      stop_delay: currentAction.stop_delay,
       poses: newPosesData,
     };
     updateActionsData(newAction);
@@ -290,6 +307,8 @@ function ActionManagerForm() {
                         id: currentAction.id,
                         name: event.target.value,
                         next: currentAction.next,
+                        start_delay: currentAction.start_delay,
+                        stop_delay: currentAction.stop_delay,
                         poses: currentAction.poses,
                       };
                       updateActionsData(newAction);
@@ -310,6 +329,8 @@ function ActionManagerForm() {
                         id: currentAction.id,
                         name: currentAction.name,
                         next: event.target.value,
+                        start_delay: currentAction.start_delay,
+                        stop_delay: currentAction.stop_delay,
                         poses: currentAction.poses,
                       };
                       updateActionsData(newAction);
@@ -335,6 +356,14 @@ function ActionManagerForm() {
                   <Button
                     variant="contained"
                     color="primary"
+                    className="button"
+                  >
+                    Play
+                  </Button>
+                  <Button
+                    style={{ marginLeft: 8 }}
+                    variant="contained"
+                    color="default"
                     className="button"
                     startIcon={<AddIcon />}
                   >
@@ -443,7 +472,6 @@ function ActionManagerForm() {
                     name: jointPoseData[event.id].name,
                     pose_pos: event.value,
                   };
-                  console.log(newJoints);
                   updateJointPoseData(newJoints);
                 }}
                 disableColumnMenu
@@ -497,11 +525,37 @@ function PublishForm() {
   const logger = useLogger();
 
   const [publishing, handlePublish] = useHandleProcess(() => {
-    const json = JSON.stringify(rawActionsDataGlobal);
+    const jsonActionsData = rawActionsDataGlobal;
+    const rawActions = [];
+    Object.keys(jsonActionsData).forEach((key) => {
+      const fixedPoses = [];
+      const rawPoses = jsonActionsData[key].poses;
+      for (let i = 0; i < rawPoses.length; i += 1) {
+        const jointsData = {};
+        for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
+          jointsData[rawPoses[i].joints[j].name] =
+            rawPoses[i].joints[j].pose_pos;
+        }
+        fixedPoses.push({
+          name: rawPoses[i].name,
+          pause: rawPoses[i].pause,
+          speed: rawPoses[i].speed,
+          joints: jointsData,
+        });
+      }
+      rawActions.push({
+        name: jsonActionsData[key].name,
+        next: jsonActionsData[key].next,
+        start_delay: jsonActionsData[key].start_delay,
+        stop_delay: jsonActionsData[key].stop_delay,
+        poses: fixedPoses,
+      });
+    });
+    const json = JSON.stringify(rawActions);
     return publisher
       .publish({ json })
       .then(() => {
-        console.log(json);
+        logger.success(`Successfully publish actions data`);
       })
       .catch((err) => {
         logger.error(`Failed to publish data! ${err.message}.`);
