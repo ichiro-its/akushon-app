@@ -114,7 +114,6 @@ function ActionManagerForm() {
   const logger = useLogger();
 
   const [test, setTest] = useState("");
-  const [result, setResult] = useState("");
   const [actionsData, setActionsData] = useState([]);
   const [posesData, setPosesData] = useState([]);
   const [jointPoseData, setJointPoseData] = useState([]);
@@ -162,7 +161,6 @@ function ActionManagerForm() {
         });
         setActionsData(rawActions);
         rawActionsDataGlobal = rawActions;
-        setResult(`${response.json}`);
       })
       .catch((err) => {
         logger.error(`Failed to call data! ${err.message}.`);
@@ -190,7 +188,6 @@ function ActionManagerForm() {
         pose_pos: currentPoses.joints[i].pose_pos,
       });
     }
-    console.log("hahaha");
     setJointPoseData(currentJointPoseData);
   };
 
@@ -258,9 +255,18 @@ function ActionManagerForm() {
             </div>
             <div style={{ marginTop: 10 }}>
               <Button
-                variant="contained"
-                style={{ background: "#11cb5f" }}
+                style={{ paddingLeft: 32, paddingRight: 32 }}
+                onClick={handleCall}
+                disabled={client === null || calling}
                 color="primary"
+                variant="contained"
+              >
+                {calling ? <CircularProgress size={24} /> : "Call"}
+              </Button>
+              <Button
+                style={{ marginLeft: 8, paddingLeft: 16, paddingRight: 16 }}
+                variant="contained"
+                color="info"
                 className="button"
                 startIcon={<AddIcon />}
               >
@@ -328,7 +334,6 @@ function ActionManagerForm() {
                 <div style={{ marginTop: 10, marginBottom: -10 }}>
                   <Button
                     variant="contained"
-                    style={{ background: "#11cb5f" }}
                     color="primary"
                     className="button"
                     startIcon={<AddIcon />}
@@ -480,28 +485,6 @@ function ActionManagerForm() {
                 rowsPerPageOptions={[]}
               />
             </div>
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} style={{ marginTop: 20 }}>
-          <Grid item xs={12}>
-            <TextField
-              label="Response"
-              value={result}
-              variant="outlined"
-              fullWidth
-              disabled
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              onClick={handleCall}
-              disabled={client === null || calling}
-              color="primary"
-              variant="contained"
-              fullWidth
-            >
-              {calling ? <CircularProgress size={24} /> : "Call"}
-            </Button>
           </Grid>
         </Grid>
       </CardContent>
