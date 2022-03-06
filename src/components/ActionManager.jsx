@@ -3,7 +3,6 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import ToggleOffIcon from "@material-ui/icons/ToggleOff";
 import { DataGrid } from "@material-ui/data-grid";
 import MuiTypography from "@material-ui/core/Typography";
 import {
@@ -11,8 +10,9 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  FormControlLabel,
   Grid,
-  IconButton,
+  Switch,
   TextField,
 } from "@material-ui/core";
 
@@ -477,12 +477,9 @@ function ActionManagerForm() {
               />
             </div>
           </Grid>
-          <Grid item xs={6} lg={1}>
+          <Grid item xs={6} lg={1} justify = "center">
             <div
-              style={{
-                paddingTop: "50%",
-                alignItems: "center",
-              }}
+              style={{ paddingTop: "50%" }}
             >
               <Button
                 variant="contained"
@@ -496,9 +493,19 @@ function ActionManagerForm() {
                 className="button"
                 startIcon={<ArrowForwardIcon />}
               />
-              <IconButton aria-label="torque">
-                <ToggleOffIcon />
-              </IconButton>
+              <FormControlLabel
+                control={
+                  <Switch
+                    // checked={state.checked}
+                    // onChange={handleChange}
+                    name="torque-switch"
+                    color="primary"
+                    aria-label="torque"
+                  />
+                }
+                style={{ marginTop: 20 }}
+                fullWidth
+              />
             </div>
           </Grid>
           <Grid item xs={6} lg={2}>
