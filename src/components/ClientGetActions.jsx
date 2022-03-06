@@ -19,11 +19,9 @@ import {
 import {
   ClientProvider,
   NodeProvider,
-  PublisherProvider,
   useClient,
   useHandleProcess,
   useLogger,
-  usePublisher,
 } from "kumo-app";
 
 import React, { useState } from "react";
@@ -125,7 +123,7 @@ function ActionManagerForm() {
   const client = useClient();
   const logger = useLogger();
 
-  const [test, setTest] = useState("");
+  const [request, setRequest] = useState("");
   const [actionsData, setActionsData] = useState([]);
   const [posesData, setPosesData] = useState([]);
   const [jointPoseData, setJointPoseData] = useState([]);
@@ -133,9 +131,9 @@ function ActionManagerForm() {
   const [currentPose, setCurrentPose] = useState({});
 
   const [calling, handleCall] = useHandleProcess(() => {
-    setTest("Request for actions list");
+    setRequest("Request to get actions list");
     return client
-      .call({ test })
+      .call({ request })
       .then((response) => {
         logger.success(`Successfully get actions data`);
         const jsonActionsData = JSON.parse(`${response.json}`);
@@ -520,11 +518,11 @@ function ActionManagerForm() {
   );
 }
 
-function PublishForm() {
-  const publisher = usePublisher();
+function SaveButton() {
+  const client = useClient();
   const logger = useLogger();
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const [calling, handleCall] = useHandleProcess(() => {
     const jsonActionsData = rawActionsDataGlobal;
     const rawActions = {};
     Object.keys(jsonActionsData).forEach((key) => {
@@ -553,10 +551,12 @@ function PublishForm() {
       rawActions[jsonActionsData[key].name.toLowerCase()] = action;
     });
     const json = JSON.stringify(rawActions);
-    return publisher
-      .publish({ json })
-      .then(() => {
-        logger.success(`Successfully publish actions data`);
+    return client
+      .call({ json })
+      .then((response) => {
+        logger.success(
+          `Successfully publish actions data with status ${response.status}.`
+        );
       })
       .catch((err) => {
         logger.error(`Failed to publish data! ${err.message}.`);
@@ -568,14 +568,14 @@ function PublishForm() {
       <CardContent>
         <Grid item xs={12}>
           <Button
-            onClick={handlePublish}
+            onClick={handleCall}
             style={{ background: "#11cb5f" }}
-            disabled={publisher == null || publishing}
+            disabled={client == null || calling}
             color="primary"
             variant="contained"
             fullWidth
           >
-            {publishing ? <CircularProgress size={24} /> : "Save"}
+            {calling ? <CircularProgress size={24} /> : "Save"}
           </Button>
         </Grid>
       </CardContent>
@@ -592,12 +592,12 @@ function ClientGetActions() {
       >
         <ActionManagerForm />
       </ClientProvider>
-      <PublisherProvider
-        messageType="akushon_interfaces/msg/SaveActions"
-        topicName="/save_actions"
+      <ClientProvider
+        serviceType="akushon_interfaces/srv/SaveActions"
+        serviceName="/save_actions"
       >
-        <PublishForm />
-      </PublisherProvider>
+        <SaveButton />
+      </ClientProvider>
     </NodeProvider>
   );
 }
