@@ -10,7 +10,7 @@ import {
   SessionProvider,
 } from "kumo-app";
 
-import ClientGetActions from "./components/ClientGetActions";
+import ActionManager from "./components/ActionManager";
 import "./App.css";
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
                 <MuiTypography variant="h6">Akushon App</MuiTypography>
               </MuiToolbar>
             </MuiAppBar>
-            <ClientGetActions />
+            <ActionManager />
           </SessionProvider>
         </BridgeProvider>
       </LoggerProvider>

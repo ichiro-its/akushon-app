@@ -30,7 +30,7 @@ const actionColumns = [
   {
     field: "name",
     headerName: "Name",
-    width: 125,
+    width: 160,
     sortable: false,
   },
   {
@@ -42,13 +42,13 @@ const actionColumns = [
   {
     field: "start_delay",
     headerName: "Start Delay",
-    width: 60,
+    width: 75,
     sortable: false,
   },
   {
     field: "stop_delay",
     headerName: "Stop Delay",
-    width: 60,
+    width: 75,
     sortable: false,
   },
   {
@@ -583,7 +583,7 @@ function SaveButton() {
   );
 }
 
-function ClientGetActions() {
+function ActionManager() {
   return (
     <NodeProvider nodeName="akushon_app">
       <ClientProvider
@@ -602,4 +602,4 @@ function ClientGetActions() {
   );
 }
 
-export default ClientGetActions;
+export default ActionManager;
