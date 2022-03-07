@@ -24,7 +24,9 @@ import {
   useLogger,
 } from "kumo-app";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+
+import ActionContext from "../context/ActionContext";
 
 const actionColumns = [
   {
@@ -123,12 +125,19 @@ function ActionManagerForm() {
   const client = useClient();
   const logger = useLogger();
 
+  const {
+    actionsData,
+    posesData,
+    jointPoseData,
+    currentAction,
+    currentPose,
+    setActionsData,
+    setPosesData,
+    setJointPoseData,
+    setCurrentAction,
+    setCurrentPose,
+  } = useContext(ActionContext);
   const [request, setRequest] = useState("");
-  const [actionsData, setActionsData] = useState([]);
-  const [posesData, setPosesData] = useState([]);
-  const [jointPoseData, setJointPoseData] = useState([]);
-  const [currentAction, setCurrentAction] = useState({});
-  const [currentPose, setCurrentPose] = useState({});
 
   const [calling, handleCall] = useHandleProcess(() => {
     setRequest("Request to get actions list");
@@ -523,6 +532,49 @@ function ActionManagerForm() {
   );
 }
 
+function PlayButton() {
+  const client = useClient();
+  const logger = useLogger();
+
+  const { currentAction } = useContext(ActionContext);
+
+  const [calling, handleCall] = useHandleProcess(() => {
+    const action = currentAction;
+    const action_name = action.name;
+    const action_id = action.id;
+
+    return client
+      .call({ action_name, action_id })
+      .then((response) => {
+        logger.success(
+          `Successfully publish actions data with status ${response.status}.`
+        );
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish data! ${err.message}.`);
+      });
+  }, 500);
+
+  return (
+    <Card>
+      <CardContent>
+        <Grid item xs={12}>
+          <Button
+            onClick={handleCall}
+            style={{ background: "#11cb5f" }}
+            disabled={client == null || calling}
+            color="default"
+            variant="contained"
+            fullWidth
+          >
+            {calling ? <CircularProgress size={24} /> : "Play"}
+          </Button>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+}
+
 function SaveButton() {
   const client = useClient();
   const logger = useLogger();
@@ -596,6 +648,12 @@ function ActionManager() {
         serviceName="/get_actions"
       >
         <ActionManagerForm />
+      </ClientProvider>
+      <ClientProvider
+        serviceType="akushon_interfaces/srv/PlayAction"
+        serviceName="/play_actions"
+      >
+        <PlayButton />
       </ClientProvider>
       <ClientProvider
         serviceType="akushon_interfaces/srv/SaveActions"
