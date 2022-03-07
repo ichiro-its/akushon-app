@@ -281,7 +281,7 @@ function ActionManagerForm() {
               <Button
                 style={{ marginLeft: 8, paddingLeft: 16, paddingRight: 16 }}
                 variant="contained"
-                color="info"
+                color="default"
                 className="button"
                 startIcon={<AddIcon />}
               >
@@ -477,10 +477,8 @@ function ActionManagerForm() {
               />
             </div>
           </Grid>
-          <Grid item xs={6} lg={1} justify = "center">
-            <div
-              style={{ paddingTop: "50%" }}
-            >
+          <Grid item xs={6} lg={1}>
+            <div style={{ paddingTop: "50%" }}>
               <Button
                 variant="contained"
                 color="default"
@@ -504,7 +502,7 @@ function ActionManagerForm() {
                   />
                 }
                 style={{ marginTop: 20 }}
-                fullWidth
+                fullwidth="true"
               />
             </div>
           </Grid>
