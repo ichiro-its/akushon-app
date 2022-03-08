@@ -362,7 +362,7 @@ function ActionManagerForm() {
                 <div style={{ marginTop: 10, marginBottom: -10 }}>
                   <Button
                     variant="contained"
-                    color="primary"
+                    color="default"
                     className="button"
                   >
                     Play
@@ -539,9 +539,8 @@ function PlayButton() {
   const { currentAction } = useContext(ActionContext);
 
   const [calling, handleCall] = useHandleProcess(() => {
-    const action = currentAction;
-    const action_name = action.name;
-    const action_id = action.id;
+    const action_name = currentAction.name;
+    const action_id = currentAction.id;
 
     return client
       .call({ action_name, action_id })
@@ -556,22 +555,15 @@ function PlayButton() {
   }, 500);
 
   return (
-    <Card>
-      <CardContent>
-        <Grid item xs={12}>
-          <Button
-            onClick={handleCall}
-            style={{ background: "#11cb5f" }}
-            disabled={client == null || calling}
-            color="default"
-            variant="contained"
-            fullWidth
-          >
-            {calling ? <CircularProgress size={24} /> : "Play"}
-          </Button>
-        </Grid>
-      </CardContent>
-    </Card>
+    <Button
+      onClick={handleCall}
+      style={{width: "49.5%"}}
+      disabled={client == null || calling}
+      color="primary"
+      variant="contained"
+    >
+      {calling ? <CircularProgress size={24} /> : "Play Action"}
+    </Button>
   );
 }
 
@@ -612,31 +604,24 @@ function SaveButton() {
       .call({ json })
       .then((response) => {
         logger.success(
-          `Successfully publish actions data with status ${response.status}.`
+          `Successfully send actions data with status ${response.status}.`
         );
       })
       .catch((err) => {
-        logger.error(`Failed to publish data! ${err.message}.`);
+        logger.error(`Failed to send data! ${err.message}.`);
       });
   }, 500);
 
   return (
-    <Card>
-      <CardContent>
-        <Grid item xs={12}>
-          <Button
-            onClick={handleCall}
-            style={{ background: "#11cb5f" }}
-            disabled={client == null || calling}
-            color="primary"
-            variant="contained"
-            fullWidth
-          >
-            {calling ? <CircularProgress size={24} /> : "Save"}
-          </Button>
-        </Grid>
-      </CardContent>
-    </Card>
+    <Button
+      onClick={handleCall}
+      style={{ background: "#11cb5f", width: "49.5%", marginLeft: "1%"}}
+      disabled={client == null || calling}
+      color="primary"
+      variant="contained"
+    >
+      {calling ? <CircularProgress size={24} /> : "Save"}
+    </Button>
   );
 }
 
@@ -649,18 +634,24 @@ function ActionManager() {
       >
         <ActionManagerForm />
       </ClientProvider>
-      <ClientProvider
-        serviceType="akushon_interfaces/srv/PlayAction"
-        serviceName="/play_actions"
-      >
-        <PlayButton />
-      </ClientProvider>
-      <ClientProvider
-        serviceType="akushon_interfaces/srv/SaveActions"
-        serviceName="/save_actions"
-      >
-        <SaveButton />
-      </ClientProvider>
+      <Card>
+        <CardContent>
+        <div style={{ marginTop: 10, marginBottom: -10 }}>
+          <ClientProvider
+            serviceType="akushon_interfaces/srv/RunAction"
+            serviceName="/run_action"
+          >
+            <PlayButton />
+          </ClientProvider>
+          <ClientProvider
+            serviceType="akushon_interfaces/srv/SaveActions"
+            serviceName="/save_actions"
+          >
+            <SaveButton />
+          </ClientProvider>
+        </div>
+        </CardContent>
+      </Card>
     </NodeProvider>
   );
 }
