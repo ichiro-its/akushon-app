@@ -539,11 +539,31 @@ function PlayButton() {
   const { currentAction } = useContext(ActionContext);
 
   const [calling, handleCall] = useHandleProcess(() => {
-    const action_name = currentAction.name;
-    const action_id = currentAction.id;
+    const fixedPoses = [];
+    const rawPoses = currentAction.poses;
+    for (let i = 0; i < rawPoses.length; i += 1) {
+      const jointsData = {};
+      for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
+        jointsData[rawPoses[i].joints[j].name] = rawPoses[i].joints[j].pose_pos;
+      }
+      fixedPoses.push({
+        name: rawPoses[i].name,
+        pause: rawPoses[i].pause,
+        speed: rawPoses[i].speed,
+        joints: jointsData,
+      });
+    }
+    const rawAction = {
+      name: currentAction.name,
+      next: currentAction.next,
+      start_delay: currentAction.start_delay,
+      stop_delay: currentAction.stop_delay,
+      poses: fixedPoses,
+    };
 
+    const json = JSON.stringify(rawAction);
     return client
-      .call({ action_name, action_id })
+      .call({ json })
       .then((response) => {
         logger.success(
           `Successfully publish actions data with status ${response.status}.`
@@ -557,7 +577,7 @@ function PlayButton() {
   return (
     <Button
       onClick={handleCall}
-      style={{width: "49.5%"}}
+      style={{ width: "49.5%" }}
       disabled={client == null || calling}
       color="primary"
       variant="contained"
@@ -615,7 +635,7 @@ function SaveButton() {
   return (
     <Button
       onClick={handleCall}
-      style={{ background: "#11cb5f", width: "49.5%", marginLeft: "1%"}}
+      style={{ background: "#11cb5f", width: "49.5%", marginLeft: "1%" }}
       disabled={client == null || calling}
       color="primary"
       variant="contained"
@@ -636,20 +656,20 @@ function ActionManager() {
       </ClientProvider>
       <Card>
         <CardContent>
-        <div style={{ marginTop: 10, marginBottom: -10 }}>
-          <ClientProvider
-            serviceType="akushon_interfaces/srv/RunAction"
-            serviceName="/run_action"
-          >
-            <PlayButton />
-          </ClientProvider>
-          <ClientProvider
-            serviceType="akushon_interfaces/srv/SaveActions"
-            serviceName="/save_actions"
-          >
-            <SaveButton />
-          </ClientProvider>
-        </div>
+          <div style={{ marginTop: 10, marginBottom: -10 }}>
+            <ClientProvider
+              serviceType="akushon_interfaces/srv/RunAction"
+              serviceName="/run_action"
+            >
+              <PlayButton />
+            </ClientProvider>
+            <ClientProvider
+              serviceType="akushon_interfaces/srv/SaveActions"
+              serviceName="/save_actions"
+            >
+              <SaveButton />
+            </ClientProvider>
+          </div>
         </CardContent>
       </Card>
     </NodeProvider>
