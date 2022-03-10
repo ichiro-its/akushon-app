@@ -13,6 +13,7 @@ module.exports = {
   },
   plugins: ["prettier"],
   rules: {
+    camelcase: "off",
     "prettier/prettier": "error",
     "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
   },

@@ -19,12 +19,14 @@ import {
 import {
   ClientProvider,
   NodeProvider,
+  PublisherProvider,
   useClient,
   useHandleProcess,
   useLogger,
+  usePublisher,
 } from "kumo-app";
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 
 import ActionContext from "../context/ActionContext";
 
@@ -134,6 +136,7 @@ function ActionManagerForm() {
     setActionsData,
     setPosesData,
     setJointPoseData,
+    setJointSelected,
     setCurrentAction,
     setCurrentPose,
   } = useContext(ActionContext);
@@ -267,7 +270,7 @@ function ActionManagerForm() {
       <CardContent>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
-            <div style={{ height: 640, width: "100%" }}>
+            <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={actionsData}
                 columns={actionColumns}
@@ -298,7 +301,7 @@ function ActionManagerForm() {
               </Button>
             </div>
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6} lg={3}>
             <Card>
               <CardContent>
                 <MuiTypography variant="subtitle1">Action</MuiTypography>
@@ -348,7 +351,7 @@ function ActionManagerForm() {
                     }}
                   />
                 </div>
-                <div style={{ height: 300, width: "100%" }}>
+                <div style={{ height: 360, width: "100%" }}>
                   <DataGrid
                     rows={posesData}
                     columns={poseColumns}
@@ -467,7 +470,7 @@ function ActionManagerForm() {
             </Card>
           </Grid>
 
-          <Grid item xs={6} lg={2}>
+          <Grid item xs={12} lg={3}>
             <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={jointPoseData}
@@ -482,25 +485,45 @@ function ActionManagerForm() {
                   updateJointPoseData(newJoints);
                 }}
                 disableColumnMenu
+                onStateChange={(event) => {
+                  setJointSelected(event.state.selection);
+                }}
+                checkboxSelection
                 rowsPerPageOptions={[]}
               />
             </div>
-          </Grid>
-          <Grid item xs={6} lg={1}>
-            <div style={{ paddingTop: "50%" }}>
-              <Button
-                variant="contained"
-                color="default"
-                className="button"
-                startIcon={<ArrowBackIcon />}
-              />
+            <div style={{ marginTop: 10, float: "right" }}>
               <Button
                 variant="contained"
                 color="default"
                 className="button"
                 startIcon={<ArrowForwardIcon />}
               />
+            </div>
+          </Grid>
+          <Grid item xs={6} lg={3}>
+            <div style={{ height: 680, width: "100%" }}>
+              <DataGrid
+                rows={jointRobotData}
+                columns={jointRobotColumns}
+                rowHeight={25}
+                disableColumnMenu
+                onStateChange={(event) => {
+                  setJointSelected(event.state.selection);
+                }}
+                checkboxSelection
+                rowsPerPageOptions={[]}
+              />
+            </div>
+            <div style={{ marginTop: 10, float: "left" }}>
+              <Button
+                variant="contained"
+                color="default"
+                className="button"
+                startIcon={<ArrowBackIcon />}
+              />
               <FormControlLabel
+                style={{ marginTop: -4, marginLeft: 10 }}
                 control={
                   <Switch
                     // checked={state.checked}
@@ -510,25 +533,106 @@ function ActionManagerForm() {
                     aria-label="torque"
                   />
                 }
-                style={{ marginTop: 20 }}
-                fullwidth="true"
-              />
-            </div>
-          </Grid>
-          <Grid item xs={6} lg={2}>
-            <div style={{ height: 680, width: "100%" }}>
-              <DataGrid
-                rows={jointRobotData}
-                columns={jointRobotColumns}
-                rowHeight={25}
-                disableColumnMenu
-                rowsPerPageOptions={[]}
+                label="On Torques"
               />
             </div>
           </Grid>
         </Grid>
       </CardContent>
     </Card>
+  );
+}
+
+function SetTorquesButton() {
+  const publisher = usePublisher();
+  const logger = useLogger();
+
+  const { jointSelected } = useContext(ActionContext);
+
+  const [state, setState] = useState(true);
+  const [changed, setChanged] = useState(false);
+
+  const [publishing, handlePublish] = useHandleProcess(() => {
+    const ids = jointSelected;
+    const torque_enable = state;
+    logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
+    return publisher
+      .publish({ ids, torque_enable })
+      .then(() => {
+        logger.success(`Successfully publish set torques.`);
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish set torques data! ${err.message}.`);
+      });
+  }, 500);
+
+  useEffect(() => {
+    if (changed) {
+      handlePublish();
+      setChanged(false);
+    }
+  });
+
+  const handleChange = (event) => {
+    setState(event.target.checked);
+    setChanged(true);
+  };
+
+  return (
+    <FormControlLabel
+      control={
+        publishing ? (
+          <CircularProgress size={24} />
+        ) : (
+          <Switch
+            checked={state}
+            onChange={handleChange}
+            name="checked"
+            color="primary"
+            aria-label="torque"
+          />
+        )
+      }
+      style={{ marginLeft: "1%" }}
+      fullwidth="true"
+    />
+  );
+}
+
+function SetJointsButton() {
+  const publisher = usePublisher();
+  const logger = useLogger();
+
+  const { jointPoseData } = useContext(ActionContext);
+
+  const [publishing, handlePublish] = useHandleProcess(() => {
+    const joints = [];
+    for (let i = 0; i < jointPoseData.length; i += 1) {
+      joints.push({
+        id: i,
+        position: jointPoseData[i].pose_pos,
+      });
+    }
+    return publisher
+      .publish({ joints })
+      .then(() => {
+        logger.success(`Successfully publish set joints.`);
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish set joints data! ${err.message}.`);
+      });
+  }, 500);
+
+  return (
+    <Button
+      style={{ width: "49.5%" }}
+      onClick={handlePublish}
+      disabled={publisher === null || publishing}
+      color="primary"
+      variant="contained"
+    >
+      {publishing ? <CircularProgress size={24} /> : "Set Joints"}
+    </Button>
   );
 }
 
@@ -656,7 +760,7 @@ function ActionManager() {
       </ClientProvider>
       <Card>
         <CardContent>
-          <div style={{ marginTop: 10, marginBottom: -10 }}>
+          <div style={{ marginTop: -10, marginBottom: -25 }}>
             <ClientProvider
               serviceType="akushon_interfaces/srv/RunAction"
               serviceName="/run_action"
@@ -669,6 +773,24 @@ function ActionManager() {
             >
               <SaveButton />
             </ClientProvider>
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent>
+          <div style={{ marginTop: -5 }}>
+            <PublisherProvider
+              messageType="tachimawari_interfaces/msg/SetJoints"
+              topicName="/joint/set_joints"
+            >
+              <SetJointsButton />
+            </PublisherProvider>
+            <PublisherProvider
+              messageType="tachimawari_interfaces/msg/SetTorques"
+              topicName="/joint/set_torques"
+            >
+              <SetTorquesButton />
+            </PublisherProvider>
           </div>
         </CardContent>
       </Card>
