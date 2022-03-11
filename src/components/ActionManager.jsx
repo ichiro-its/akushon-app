@@ -123,7 +123,7 @@ const jointRobotColumns = [
 
 let rawActionsDataGlobal = [];
 
-function ActionManagerForm() {
+function GetActionsButton() {
   const client = useClient();
   const logger = useLogger();
 
@@ -279,7 +279,7 @@ function SetJointsButton(props) {
     <Button
       onClick={handlePublish}
       disabled={publisher === null || publishing}
-      color="default"
+      color={ typeButton === "to_robot" ? "default" : "primary" }
       variant="contained"
       startIcon={
         typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
@@ -294,7 +294,7 @@ SetJointsButton.propTypes = {
   typeButton: PropTypes.string.isRequired,
 };
 
-function PlayButton() {
+function RunActionButton() {
   const client = useClient();
   const logger = useLogger();
 
@@ -348,7 +348,7 @@ function PlayButton() {
   );
 }
 
-function SaveButton() {
+function SaveActionsButton() {
   const client = useClient();
   const logger = useLogger();
 
@@ -522,22 +522,13 @@ function ActionManager() {
                   serviceType="akushon_interfaces/srv/GetActions"
                   serviceName="/get_actions"
                 >
-                  <ActionManagerForm />
+                  <GetActionsButton />
                 </ClientProvider>
-                <Button
-                  style={{ marginLeft: 8, paddingLeft: 16, paddingRight: 16 }}
-                  variant="contained"
-                  color="default"
-                  className="button"
-                  startIcon={<AddIcon />}
-                >
-                  Add Action
-                </Button>
                 <ClientProvider
                   serviceType="akushon_interfaces/srv/SaveActions"
                   serviceName="/save_actions"
                 >
-                  <SaveButton />
+                  <SaveActionsButton />
                 </ClientProvider>
               </div>
             </Grid>
@@ -712,7 +703,7 @@ function ActionManager() {
                   serviceType="akushon_interfaces/srv/RunAction"
                   serviceName="/run_action"
                 >
-                  <PlayButton />
+                  <RunActionButton />
                 </ClientProvider>
                 <Button
                   style={{ marginLeft: 8 }}
