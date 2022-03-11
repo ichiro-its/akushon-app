@@ -1,36 +1,22 @@
 import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import { DataGrid } from "@material-ui/data-grid";
 import MuiTypography from "@material-ui/core/Typography";
-import PropTypes from "prop-types";
-import {
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  FormControlLabel,
-  Grid,
-  Switch,
-  TextField,
-} from "@material-ui/core";
+import { Button, Card, CardContent, Grid, TextField } from "@material-ui/core";
 
-import {
-  ClientProvider,
-  NodeProvider,
-  PublisherProvider,
-  useClient,
-  useHandleProcess,
-  useLogger,
-  usePublisher,
-} from "kumo-app";
+import { ClientProvider, NodeProvider, PublisherProvider } from "kumo-app";
 
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
+
+import SetTorquesButton from "./SetTorquesButton";
+import SetJointsButton from "./SetJointsButton";
+import GetActionsButton from "./GetActionsButton";
+import RunActionButton from "./RunActionButton";
+import SaveActionsButton from "./SaveActionsButton";
 
 const actionColumns = [
   {
@@ -121,296 +107,6 @@ const jointRobotColumns = [
   },
 ];
 
-let rawActionsDataGlobal = [];
-
-function GetActionsButton() {
-  const client = useClient();
-  const logger = useLogger();
-
-  const { setActionsData } = useContext(ActionContext);
-  const [request, setRequest] = useState("");
-
-  const [calling, handleCall] = useHandleProcess(() => {
-    setRequest("Request to get actions list");
-    return client
-      .call({ request })
-      .then((response) => {
-        logger.success(`Successfully get actions data`);
-        const jsonActionsData = JSON.parse(`${response.json}`);
-
-        let idCounter = -1;
-        const rawActions = [];
-        Object.keys(jsonActionsData).forEach((key) => {
-          idCounter += 1;
-          const fixedPoses = [];
-          const rawPoses = jsonActionsData[key].poses;
-          for (let i = 0; i < rawPoses.length; i += 1) {
-            let idJointCounter = -1;
-            const jointsData = [];
-            Object.keys(rawPoses[i].joints).forEach((index) => {
-              idJointCounter += 1;
-              jointsData.push({
-                id: idJointCounter,
-                name: index,
-                pose_pos: rawPoses[i].joints[index],
-              });
-            });
-            fixedPoses.push({
-              id: i,
-              name: rawPoses[i].name,
-              speed: rawPoses[i].speed,
-              pause: rawPoses[i].pause,
-              joints: jointsData,
-            });
-          }
-          rawActions.push({
-            id: idCounter,
-            name: jsonActionsData[key].name,
-            start_delay: jsonActionsData[key].start_delay,
-            stop_delay: jsonActionsData[key].stop_delay,
-            next: jsonActionsData[key].next,
-            poses: fixedPoses,
-          });
-        });
-        setActionsData(rawActions);
-        rawActionsDataGlobal = rawActions;
-      })
-      .catch((err) => {
-        logger.error(`Failed to call data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      style={{ paddingLeft: 24, paddingRight: 24, marginLeft: 8 }}
-      onClick={handleCall}
-      disabled={client === null || calling}
-      color="primary"
-      variant="contained"
-    >
-      {calling ? <CircularProgress size={24} /> : "Get Actions"}
-    </Button>
-  );
-}
-
-function SetTorquesButton() {
-  const publisher = usePublisher();
-  const logger = useLogger();
-
-  const { jointSelected } = useContext(ActionContext);
-
-  const [state, setState] = useState(true);
-  const [changed, setChanged] = useState(false);
-
-  const [publishing, handlePublish] = useHandleProcess(() => {
-    const ids = jointSelected;
-    const torque_enable = state;
-    logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
-    return publisher
-      .publish({ ids, torque_enable })
-      .then(() => {
-        logger.success(`Successfully publish set torques.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set torques data! ${err.message}.`);
-      });
-  }, 500);
-
-  useEffect(() => {
-    if (changed) {
-      handlePublish();
-      setChanged(false);
-    }
-  });
-
-  const handleChange = (event) => {
-    setState(event.target.checked);
-    setChanged(true);
-  };
-
-  return (
-    <FormControlLabel
-      style={{ marginTop: -4, marginLeft: 10 }}
-      control={
-        publishing ? (
-          <CircularProgress size={24} />
-        ) : (
-          <Switch
-            checked={state}
-            onChange={handleChange}
-            name="checked"
-            color="primary"
-            aria-label="torque"
-          />
-        )
-      }
-      label="On Torques"
-      fullwidth="true"
-    />
-  );
-}
-
-function SetJointsButton(props) {
-  const { typeButton } = props;
-  const publisher = usePublisher();
-  const logger = useLogger();
-
-  const { jointPoseData } = useContext(ActionContext);
-
-  const [publishing, handlePublish] = useHandleProcess(() => {
-    const joints = [];
-    for (let i = 0; i < jointPoseData.length; i += 1) {
-      joints.push({
-        id: i,
-        position: jointPoseData[i].pose_pos,
-      });
-    }
-    return publisher
-      .publish({ joints })
-      .then(() => {
-        logger.success(`Successfully publish set joints.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set joints data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      onClick={handlePublish}
-      disabled={publisher === null || publishing}
-      color={typeButton === "to_robot" ? "default" : "primary"}
-      variant="contained"
-      startIcon={
-        typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
-      }
-    >
-      {publishing ? <CircularProgress size={24} /> : ""}
-    </Button>
-  );
-}
-
-SetJointsButton.propTypes = {
-  typeButton: PropTypes.string.isRequired,
-};
-
-function RunActionButton() {
-  const client = useClient();
-  const logger = useLogger();
-
-  const { currentAction } = useContext(ActionContext);
-
-  const [calling, handleCall] = useHandleProcess(() => {
-    const fixedPoses = [];
-    const rawPoses = currentAction.poses;
-    for (let i = 0; i < rawPoses.length; i += 1) {
-      const jointsData = {};
-      for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
-        jointsData[rawPoses[i].joints[j].name] = rawPoses[i].joints[j].pose_pos;
-      }
-      fixedPoses.push({
-        name: rawPoses[i].name,
-        pause: rawPoses[i].pause,
-        speed: rawPoses[i].speed,
-        joints: jointsData,
-      });
-    }
-    const rawAction = {
-      name: currentAction.name,
-      next: currentAction.next,
-      start_delay: currentAction.start_delay,
-      stop_delay: currentAction.stop_delay,
-      poses: fixedPoses,
-    };
-
-    const json = JSON.stringify(rawAction);
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully publish actions data with status ${response.status}.`
-        );
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      onClick={handleCall}
-      disabled={client == null || calling}
-      color="primary"
-      variant="contained"
-    >
-      {calling ? <CircularProgress size={24} /> : "Play Action"}
-    </Button>
-  );
-}
-
-function SaveActionsButton() {
-  const client = useClient();
-  const logger = useLogger();
-
-  const [calling, handleCall] = useHandleProcess(() => {
-    const jsonActionsData = rawActionsDataGlobal;
-    const rawActions = {};
-    Object.keys(jsonActionsData).forEach((key) => {
-      const fixedPoses = [];
-      const rawPoses = jsonActionsData[key].poses;
-      for (let i = 0; i < rawPoses.length; i += 1) {
-        const jointsData = {};
-        for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
-          jointsData[rawPoses[i].joints[j].name] =
-            rawPoses[i].joints[j].pose_pos;
-        }
-        fixedPoses.push({
-          name: rawPoses[i].name,
-          pause: rawPoses[i].pause,
-          speed: rawPoses[i].speed,
-          joints: jointsData,
-        });
-      }
-      const action = {
-        name: jsonActionsData[key].name,
-        next: jsonActionsData[key].next,
-        start_delay: jsonActionsData[key].start_delay,
-        stop_delay: jsonActionsData[key].stop_delay,
-        poses: fixedPoses,
-      };
-      rawActions[jsonActionsData[key].name.toLowerCase()] = action;
-    });
-    const json = JSON.stringify(rawActions);
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully send actions data with status ${response.status}.`
-        );
-      })
-      .catch((err) => {
-        logger.error(`Failed to send data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      onClick={handleCall}
-      style={{
-        background: "#11cb5f",
-        marginLeft: 8,
-        paddingLeft: 16,
-        paddingRight: 16,
-      }}
-      disabled={client == null || calling}
-      color="primary"
-      variant="contained"
-    >
-      {calling ? <CircularProgress size={24} /> : "Save"}
-    </Button>
-  );
-}
-
 function ActionManager() {
   const {
     actionsData,
@@ -460,7 +156,6 @@ function ActionManager() {
       ...actionsData.slice(newAction.id + 1),
     ];
     setActionsData(newActionsData);
-    rawActionsDataGlobal = newActionsData;
   };
 
   const updatePosesData = (newPose) => {
