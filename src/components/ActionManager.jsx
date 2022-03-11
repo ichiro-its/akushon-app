@@ -182,7 +182,7 @@ function GetActionsButton() {
 
   return (
     <Button
-      style={{ paddingLeft: 32, paddingRight: 32 }}
+      style={{ paddingLeft: 24, paddingRight: 24, marginLeft: 8 }}
       onClick={handleCall}
       disabled={client === null || calling}
       color="primary"
