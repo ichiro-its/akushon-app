@@ -3,8 +3,10 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import { DataGrid } from "@material-ui/data-grid";
 import MuiTypography from "@material-ui/core/Typography";
+import PropTypes from "prop-types";
 import {
   Button,
   Card,
@@ -122,24 +124,10 @@ const jointRobotColumns = [
 let rawActionsDataGlobal = [];
 
 function ActionManagerForm() {
-  const jointRobotData = initJointRobotData;
-
   const client = useClient();
   const logger = useLogger();
 
-  const {
-    actionsData,
-    posesData,
-    jointPoseData,
-    currentAction,
-    currentPose,
-    setActionsData,
-    setPosesData,
-    setJointPoseData,
-    setJointSelected,
-    setCurrentAction,
-    setCurrentPose,
-  } = useContext(ActionContext);
+  const { setActionsData } = useContext(ActionContext);
   const [request, setRequest] = useState("");
 
   const [calling, handleCall] = useHandleProcess(() => {
@@ -191,6 +179,254 @@ function ActionManagerForm() {
         logger.error(`Failed to call data! ${err.message}.`);
       });
   }, 500);
+
+  return (
+    <Button
+      style={{ paddingLeft: 32, paddingRight: 32 }}
+      onClick={handleCall}
+      disabled={client === null || calling}
+      color="primary"
+      variant="contained"
+    >
+      {calling ? <CircularProgress size={24} /> : "Call"}
+    </Button>
+  );
+}
+
+function SetTorquesButton() {
+  const publisher = usePublisher();
+  const logger = useLogger();
+
+  const { jointSelected } = useContext(ActionContext);
+
+  const [state, setState] = useState(true);
+  const [changed, setChanged] = useState(false);
+
+  const [publishing, handlePublish] = useHandleProcess(() => {
+    const ids = jointSelected;
+    const torque_enable = state;
+    logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
+    return publisher
+      .publish({ ids, torque_enable })
+      .then(() => {
+        logger.success(`Successfully publish set torques.`);
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish set torques data! ${err.message}.`);
+      });
+  }, 500);
+
+  useEffect(() => {
+    if (changed) {
+      handlePublish();
+      setChanged(false);
+    }
+  });
+
+  const handleChange = (event) => {
+    setState(event.target.checked);
+    setChanged(true);
+  };
+
+  return (
+    <FormControlLabel
+      style={{ marginTop: -4, marginLeft: 10 }}
+      control={
+        publishing ? (
+          <CircularProgress size={24} />
+        ) : (
+          <Switch
+            checked={state}
+            onChange={handleChange}
+            name="checked"
+            color="primary"
+            aria-label="torque"
+          />
+        )
+      }
+      label="On Torques"
+      fullwidth="true"
+    />
+  );
+}
+
+function SetJointsButton(props) {
+  const { typeButton } = props;
+  const publisher = usePublisher();
+  const logger = useLogger();
+
+  const { jointPoseData } = useContext(ActionContext);
+
+  const [publishing, handlePublish] = useHandleProcess(() => {
+    const joints = [];
+    for (let i = 0; i < jointPoseData.length; i += 1) {
+      joints.push({
+        id: i,
+        position: jointPoseData[i].pose_pos,
+      });
+    }
+    return publisher
+      .publish({ joints })
+      .then(() => {
+        logger.success(`Successfully publish set joints.`);
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish set joints data! ${err.message}.`);
+      });
+  }, 500);
+
+  return (
+    <Button
+      onClick={handlePublish}
+      disabled={publisher === null || publishing}
+      color="default"
+      variant="contained"
+      startIcon={
+        typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
+      }
+    >
+      {publishing ? <CircularProgress size={24} /> : ""}
+    </Button>
+  );
+}
+
+SetJointsButton.propTypes = {
+  typeButton: PropTypes.string.isRequired,
+};
+
+function PlayButton() {
+  const client = useClient();
+  const logger = useLogger();
+
+  const { currentAction } = useContext(ActionContext);
+
+  const [calling, handleCall] = useHandleProcess(() => {
+    const fixedPoses = [];
+    const rawPoses = currentAction.poses;
+    for (let i = 0; i < rawPoses.length; i += 1) {
+      const jointsData = {};
+      for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
+        jointsData[rawPoses[i].joints[j].name] = rawPoses[i].joints[j].pose_pos;
+      }
+      fixedPoses.push({
+        name: rawPoses[i].name,
+        pause: rawPoses[i].pause,
+        speed: rawPoses[i].speed,
+        joints: jointsData,
+      });
+    }
+    const rawAction = {
+      name: currentAction.name,
+      next: currentAction.next,
+      start_delay: currentAction.start_delay,
+      stop_delay: currentAction.stop_delay,
+      poses: fixedPoses,
+    };
+
+    const json = JSON.stringify(rawAction);
+    return client
+      .call({ json })
+      .then((response) => {
+        logger.success(
+          `Successfully publish actions data with status ${response.status}.`
+        );
+      })
+      .catch((err) => {
+        logger.error(`Failed to publish data! ${err.message}.`);
+      });
+  }, 500);
+
+  return (
+    <Button
+      onClick={handleCall}
+      disabled={client == null || calling}
+      color="primary"
+      variant="contained"
+    >
+      {calling ? <CircularProgress size={24} /> : "Play Action"}
+    </Button>
+  );
+}
+
+function SaveButton() {
+  const client = useClient();
+  const logger = useLogger();
+
+  const [calling, handleCall] = useHandleProcess(() => {
+    const jsonActionsData = rawActionsDataGlobal;
+    const rawActions = {};
+    Object.keys(jsonActionsData).forEach((key) => {
+      const fixedPoses = [];
+      const rawPoses = jsonActionsData[key].poses;
+      for (let i = 0; i < rawPoses.length; i += 1) {
+        const jointsData = {};
+        for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
+          jointsData[rawPoses[i].joints[j].name] =
+            rawPoses[i].joints[j].pose_pos;
+        }
+        fixedPoses.push({
+          name: rawPoses[i].name,
+          pause: rawPoses[i].pause,
+          speed: rawPoses[i].speed,
+          joints: jointsData,
+        });
+      }
+      const action = {
+        name: jsonActionsData[key].name,
+        next: jsonActionsData[key].next,
+        start_delay: jsonActionsData[key].start_delay,
+        stop_delay: jsonActionsData[key].stop_delay,
+        poses: fixedPoses,
+      };
+      rawActions[jsonActionsData[key].name.toLowerCase()] = action;
+    });
+    const json = JSON.stringify(rawActions);
+    return client
+      .call({ json })
+      .then((response) => {
+        logger.success(
+          `Successfully send actions data with status ${response.status}.`
+        );
+      })
+      .catch((err) => {
+        logger.error(`Failed to send data! ${err.message}.`);
+      });
+  }, 500);
+
+  return (
+    <Button
+      onClick={handleCall}
+      style={{
+        background: "#11cb5f",
+        marginLeft: 8,
+        paddingLeft: 16,
+        paddingRight: 16,
+      }}
+      disabled={client == null || calling}
+      color="primary"
+      variant="contained"
+    >
+      {calling ? <CircularProgress size={24} /> : "Save"}
+    </Button>
+  );
+}
+
+function ActionManager() {
+  const {
+    actionsData,
+    posesData,
+    jointPoseData,
+    currentAction,
+    currentPose,
+    setActionsData,
+    setPosesData,
+    setJointPoseData,
+    setJointSelected,
+    setCurrentAction,
+    setCurrentPose,
+  } = useContext(ActionContext);
+
+  const jointRobotData = initJointRobotData;
 
   const handleClickedAction = (event) => {
     setCurrentAction(event.row);
@@ -266,532 +502,291 @@ function ActionManagerForm() {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={3}>
-            <div style={{ height: 680, width: "100%" }}>
-              <DataGrid
-                rows={actionsData}
-                columns={actionColumns}
-                rowHeight={32}
-                disableColumnMenu
-                rowsPerPageOptions={[]}
-                onRowClick={handleClickedAction}
-              />
-            </div>
-            <div style={{ marginTop: 10 }}>
-              <Button
-                style={{ paddingLeft: 32, paddingRight: 32 }}
-                onClick={handleCall}
-                disabled={client === null || calling}
-                color="primary"
-                variant="contained"
-              >
-                {calling ? <CircularProgress size={24} /> : "Call"}
-              </Button>
-              <Button
-                style={{ marginLeft: 8, paddingLeft: 16, paddingRight: 16 }}
-                variant="contained"
-                color="default"
-                className="button"
-                startIcon={<AddIcon />}
-              >
-                Add Action
-              </Button>
-            </div>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <Card>
-              <CardContent>
-                <MuiTypography variant="subtitle1">Action</MuiTypography>
-                <div style={{ marginBottom: 10 }}>
+    <NodeProvider nodeName="akushon_app">
+      <Card>
+        <CardContent>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6} lg={3}>
+              <div style={{ height: 680, width: "100%" }}>
+                <DataGrid
+                  rows={actionsData}
+                  columns={actionColumns}
+                  rowHeight={32}
+                  disableColumnMenu
+                  rowsPerPageOptions={[]}
+                  onRowClick={handleClickedAction}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <ClientProvider
+                  serviceType="akushon_interfaces/srv/GetActions"
+                  serviceName="/get_actions"
+                >
+                  <ActionManagerForm />
+                </ClientProvider>
+                <Button
+                  style={{ marginLeft: 8, paddingLeft: 16, paddingRight: 16 }}
+                  variant="contained"
+                  color="default"
+                  className="button"
+                  startIcon={<AddIcon />}
+                >
+                  Add Action
+                </Button>
+                <ClientProvider
+                  serviceType="akushon_interfaces/srv/SaveActions"
+                  serviceName="/save_actions"
+                >
+                  <SaveButton />
+                </ClientProvider>
+              </div>
+            </Grid>
+            <Grid item xs={12} md={6} lg={3}>
+              <Card>
+                <CardContent>
+                  <MuiTypography variant="subtitle1">Action</MuiTypography>
+                  <div style={{ marginBottom: 10 }}>
+                    <TextField
+                      id="action-name"
+                      label="Name"
+                      variant="outlined"
+                      margin="dense"
+                      value={currentAction ? currentAction.name : ""}
+                      onChange={(event) => {
+                        const newAction = {
+                          id: currentAction.id,
+                          name: event.target.value,
+                          next: currentAction.next,
+                          start_delay: currentAction.start_delay,
+                          stop_delay: currentAction.stop_delay,
+                          poses: currentAction.poses,
+                        };
+                        updateActionsData(newAction);
+                      }}
+                      style={{ margin: 3, marginTop: 20, width: "60%" }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                    <TextField
+                      id="action-next"
+                      label="Next"
+                      variant="outlined"
+                      margin="dense"
+                      value={currentAction ? currentAction.next : ""}
+                      onChange={(event) => {
+                        const newAction = {
+                          id: currentAction.id,
+                          name: currentAction.name,
+                          next: event.target.value,
+                          start_delay: currentAction.start_delay,
+                          stop_delay: currentAction.stop_delay,
+                          poses: currentAction.poses,
+                        };
+                        updateActionsData(newAction);
+                      }}
+                      style={{ margin: 3, marginTop: 20, width: "30%" }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </div>
+                  <div style={{ height: 360, width: "100%" }}>
+                    <DataGrid
+                      rows={posesData}
+                      columns={poseColumns}
+                      rowHeight={32}
+                      disableColumnMenu
+                      rowsPerPageOptions={[]}
+                      onRowClick={handleClickedPose}
+                    />
+                  </div>
+
+                  <div style={{ marginTop: 10, marginBottom: -10 }}>
+                    <PublisherProvider
+                      messageType="tachimawari_interfaces/msg/SetJoints"
+                      topicName="/joint/set_joints"
+                    >
+                      <SetJointsButton typeButton="run_pose" />
+                    </PublisherProvider>
+                    <Button
+                      style={{ marginLeft: 8 }}
+                      variant="contained"
+                      color="default"
+                      className="button"
+                      startIcon={<AddIcon />}
+                    >
+                      Add Pose
+                    </Button>
+                    <Button
+                      style={{ marginLeft: 8 }}
+                      variant="contained"
+                      color="default"
+                      className="button"
+                      startIcon={<ArrowUpwardIcon />}
+                    >
+                      Up
+                    </Button>
+                    <Button
+                      style={{ marginLeft: 8 }}
+                      variant="contained"
+                      color="default"
+                      className="button"
+                      startIcon={<ArrowDownwardIcon />}
+                    >
+                      Down
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card style={{ marginTop: 10 }}>
+                <CardContent>
+                  <MuiTypography variant="subtitle1">Pose</MuiTypography>
                   <TextField
-                    id="action-name"
+                    id="pose-name"
                     label="Name"
                     variant="outlined"
                     margin="dense"
-                    value={currentAction ? currentAction.name : ""}
+                    value={currentPose ? currentPose.name : ""}
                     onChange={(event) => {
-                      const newAction = {
-                        id: currentAction.id,
+                      const newPose = {
+                        id: currentPose.id,
                         name: event.target.value,
-                        next: currentAction.next,
-                        start_delay: currentAction.start_delay,
-                        stop_delay: currentAction.stop_delay,
-                        poses: currentAction.poses,
+                        speed: currentPose.speed,
+                        pause: currentPose.pause,
+                        joints: currentPose.joints,
                       };
-                      updateActionsData(newAction);
+                      updatePosesData(newPose);
                     }}
-                    style={{ margin: 3, marginTop: 20, width: "60%" }}
+                    style={{ margin: 3, marginTop: 20, width: "40%" }}
                     InputLabelProps={{
                       shrink: true,
                     }}
                   />
                   <TextField
-                    id="action-next"
-                    label="Next"
+                    id="pose-speed"
+                    label="Speed"
                     variant="outlined"
                     margin="dense"
-                    value={currentAction ? currentAction.next : ""}
+                    value={currentPose ? currentPose.speed : ""}
                     onChange={(event) => {
-                      const newAction = {
-                        id: currentAction.id,
-                        name: currentAction.name,
-                        next: event.target.value,
-                        start_delay: currentAction.start_delay,
-                        stop_delay: currentAction.stop_delay,
-                        poses: currentAction.poses,
+                      const newPose = {
+                        id: currentPose.id,
+                        name: currentPose.name,
+                        speed: event.target.value,
+                        pause: currentPose.pause,
+                        joints: currentPose.joints,
                       };
-                      updateActionsData(newAction);
+                      updatePosesData(newPose);
                     }}
-                    style={{ margin: 3, marginTop: 20, width: "30%" }}
+                    style={{ margin: 3, marginTop: 20, width: "25%" }}
                     InputLabelProps={{
                       shrink: true,
                     }}
                   />
-                </div>
-                <div style={{ height: 360, width: "100%" }}>
-                  <DataGrid
-                    rows={posesData}
-                    columns={poseColumns}
-                    rowHeight={32}
-                    disableColumnMenu
-                    rowsPerPageOptions={[]}
-                    onRowClick={handleClickedPose}
+                  <TextField
+                    id="pose-pause"
+                    label="Pause"
+                    variant="outlined"
+                    margin="dense"
+                    value={currentPose ? currentPose.pause : ""}
+                    onChange={(event) => {
+                      const newPose = {
+                        id: currentPose.id,
+                        name: currentPose.name,
+                        speed: currentPose.speed,
+                        pause: event.target.value,
+                        joints: currentPose.joints,
+                      };
+                      updatePosesData(newPose);
+                    }}
+                    style={{ margin: 3, marginTop: 20, width: "25%" }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
                   />
-                </div>
+                </CardContent>
+              </Card>
+              <div style={{ marginTop: 10, marginBottom: -10 }}>
+                <ClientProvider
+                  serviceType="akushon_interfaces/srv/RunAction"
+                  serviceName="/run_action"
+                >
+                  <PlayButton />
+                </ClientProvider>
+                <Button
+                  style={{ marginLeft: 8 }}
+                  variant="contained"
+                  color="default"
+                  className="button"
+                  startIcon={<AddIcon />}
+                >
+                  Add Action
+                </Button>
+              </div>
+            </Grid>
 
-                <div style={{ marginTop: 10, marginBottom: -10 }}>
-                  <Button
-                    variant="contained"
-                    color="default"
-                    className="button"
-                  >
-                    Play
-                  </Button>
-                  <Button
-                    style={{ marginLeft: 8 }}
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<AddIcon />}
-                  >
-                    Add Pose
-                  </Button>
-                  <Button
-                    style={{ marginLeft: 8 }}
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<ArrowUpwardIcon />}
-                  >
-                    Up
-                  </Button>
-                  <Button
-                    style={{ marginLeft: 8 }}
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<ArrowDownwardIcon />}
-                  >
-                    Down
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            <Card style={{ marginTop: 10 }}>
-              <CardContent>
-                <MuiTypography variant="subtitle1">Pose</MuiTypography>
-                <TextField
-                  id="pose-name"
-                  label="Name"
-                  variant="outlined"
-                  margin="dense"
-                  value={currentPose ? currentPose.name : ""}
-                  onChange={(event) => {
-                    const newPose = {
-                      id: currentPose.id,
-                      name: event.target.value,
-                      speed: currentPose.speed,
-                      pause: currentPose.pause,
-                      joints: currentPose.joints,
+            <Grid item xs={12} lg={3}>
+              <div style={{ height: 680, width: "100%" }}>
+                <DataGrid
+                  rows={jointPoseData}
+                  columns={jointPoseColumns}
+                  rowHeight={25}
+                  onCellEditCommit={(event) => {
+                    const newJoints = {
+                      id: jointPoseData[event.id].id,
+                      name: jointPoseData[event.id].name,
+                      pose_pos: event.value,
                     };
-                    updatePosesData(newPose);
+                    updateJointPoseData(newJoints);
                   }}
-                  style={{ margin: 3, marginTop: 20, width: "40%" }}
-                  InputLabelProps={{
-                    shrink: true,
+                  disableColumnMenu
+                  onStateChange={(event) => {
+                    setJointSelected(event.state.selection);
                   }}
+                  checkboxSelection
+                  rowsPerPageOptions={[]}
                 />
-                <TextField
-                  id="pose-speed"
-                  label="Speed"
-                  variant="outlined"
-                  margin="dense"
-                  value={currentPose ? currentPose.speed : ""}
-                  onChange={(event) => {
-                    const newPose = {
-                      id: currentPose.id,
-                      name: currentPose.name,
-                      speed: event.target.value,
-                      pause: currentPose.pause,
-                      joints: currentPose.joints,
-                    };
-                    updatePosesData(newPose);
+              </div>
+              <div style={{ marginTop: 10, float: "right" }}>
+                <PublisherProvider
+                  messageType="tachimawari_interfaces/msg/SetJoints"
+                  topicName="/joint/set_joints"
+                >
+                  <SetJointsButton typeButton="to_robot" />
+                </PublisherProvider>
+              </div>
+            </Grid>
+            <Grid item xs={6} lg={3}>
+              <div style={{ height: 680, width: "100%" }}>
+                <DataGrid
+                  rows={jointRobotData}
+                  columns={jointRobotColumns}
+                  rowHeight={25}
+                  disableColumnMenu
+                  onStateChange={(event) => {
+                    setJointSelected(event.state.selection);
                   }}
-                  style={{ margin: 3, marginTop: 20, width: "25%" }}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
+                  checkboxSelection
+                  rowsPerPageOptions={[]}
                 />
-                <TextField
-                  id="pose-pause"
-                  label="Pause"
-                  variant="outlined"
-                  margin="dense"
-                  value={currentPose ? currentPose.pause : ""}
-                  onChange={(event) => {
-                    const newPose = {
-                      id: currentPose.id,
-                      name: currentPose.name,
-                      speed: currentPose.speed,
-                      pause: event.target.value,
-                      joints: currentPose.joints,
-                    };
-                    updatePosesData(newPose);
-                  }}
-                  style={{ margin: 3, marginTop: 20, width: "25%" }}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
+              </div>
+              <div style={{ marginTop: 10, float: "left" }}>
+                <Button
+                  variant="contained"
+                  color="default"
+                  className="button"
+                  startIcon={<ArrowBackIcon />}
                 />
-              </CardContent>
-            </Card>
+                <PublisherProvider
+                  messageType="tachimawari_interfaces/msg/SetTorques"
+                  topicName="/joint/set_torques"
+                >
+                  <SetTorquesButton />
+                </PublisherProvider>
+              </div>
+            </Grid>
           </Grid>
-
-          <Grid item xs={12} lg={3}>
-            <div style={{ height: 680, width: "100%" }}>
-              <DataGrid
-                rows={jointPoseData}
-                columns={jointPoseColumns}
-                rowHeight={25}
-                onCellEditCommit={(event) => {
-                  const newJoints = {
-                    id: jointPoseData[event.id].id,
-                    name: jointPoseData[event.id].name,
-                    pose_pos: event.value,
-                  };
-                  updateJointPoseData(newJoints);
-                }}
-                disableColumnMenu
-                onStateChange={(event) => {
-                  setJointSelected(event.state.selection);
-                }}
-                checkboxSelection
-                rowsPerPageOptions={[]}
-              />
-            </div>
-            <div style={{ marginTop: 10, float: "right" }}>
-              <Button
-                variant="contained"
-                color="default"
-                className="button"
-                startIcon={<ArrowForwardIcon />}
-              />
-            </div>
-          </Grid>
-          <Grid item xs={6} lg={3}>
-            <div style={{ height: 680, width: "100%" }}>
-              <DataGrid
-                rows={jointRobotData}
-                columns={jointRobotColumns}
-                rowHeight={25}
-                disableColumnMenu
-                onStateChange={(event) => {
-                  setJointSelected(event.state.selection);
-                }}
-                checkboxSelection
-                rowsPerPageOptions={[]}
-              />
-            </div>
-            <div style={{ marginTop: 10, float: "left" }}>
-              <Button
-                variant="contained"
-                color="default"
-                className="button"
-                startIcon={<ArrowBackIcon />}
-              />
-              <FormControlLabel
-                style={{ marginTop: -4, marginLeft: 10 }}
-                control={
-                  <Switch
-                    // checked={state.checked}
-                    // onChange={handleChange}
-                    name="torque-switch"
-                    color="primary"
-                    aria-label="torque"
-                  />
-                }
-                label="On Torques"
-              />
-            </div>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
-  );
-}
-
-function SetTorquesButton() {
-  const publisher = usePublisher();
-  const logger = useLogger();
-
-  const { jointSelected } = useContext(ActionContext);
-
-  const [state, setState] = useState(true);
-  const [changed, setChanged] = useState(false);
-
-  const [publishing, handlePublish] = useHandleProcess(() => {
-    const ids = jointSelected;
-    const torque_enable = state;
-    logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
-    return publisher
-      .publish({ ids, torque_enable })
-      .then(() => {
-        logger.success(`Successfully publish set torques.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set torques data! ${err.message}.`);
-      });
-  }, 500);
-
-  useEffect(() => {
-    if (changed) {
-      handlePublish();
-      setChanged(false);
-    }
-  });
-
-  const handleChange = (event) => {
-    setState(event.target.checked);
-    setChanged(true);
-  };
-
-  return (
-    <FormControlLabel
-      control={
-        publishing ? (
-          <CircularProgress size={24} />
-        ) : (
-          <Switch
-            checked={state}
-            onChange={handleChange}
-            name="checked"
-            color="primary"
-            aria-label="torque"
-          />
-        )
-      }
-      style={{ marginLeft: "1%" }}
-      fullwidth="true"
-    />
-  );
-}
-
-function SetJointsButton() {
-  const publisher = usePublisher();
-  const logger = useLogger();
-
-  const { jointPoseData } = useContext(ActionContext);
-
-  const [publishing, handlePublish] = useHandleProcess(() => {
-    const joints = [];
-    for (let i = 0; i < jointPoseData.length; i += 1) {
-      joints.push({
-        id: i,
-        position: jointPoseData[i].pose_pos,
-      });
-    }
-    return publisher
-      .publish({ joints })
-      .then(() => {
-        logger.success(`Successfully publish set joints.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set joints data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      style={{ width: "49.5%" }}
-      onClick={handlePublish}
-      disabled={publisher === null || publishing}
-      color="primary"
-      variant="contained"
-    >
-      {publishing ? <CircularProgress size={24} /> : "Set Joints"}
-    </Button>
-  );
-}
-
-function PlayButton() {
-  const client = useClient();
-  const logger = useLogger();
-
-  const { currentAction } = useContext(ActionContext);
-
-  const [calling, handleCall] = useHandleProcess(() => {
-    const fixedPoses = [];
-    const rawPoses = currentAction.poses;
-    for (let i = 0; i < rawPoses.length; i += 1) {
-      const jointsData = {};
-      for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
-        jointsData[rawPoses[i].joints[j].name] = rawPoses[i].joints[j].pose_pos;
-      }
-      fixedPoses.push({
-        name: rawPoses[i].name,
-        pause: rawPoses[i].pause,
-        speed: rawPoses[i].speed,
-        joints: jointsData,
-      });
-    }
-    const rawAction = {
-      name: currentAction.name,
-      next: currentAction.next,
-      start_delay: currentAction.start_delay,
-      stop_delay: currentAction.stop_delay,
-      poses: fixedPoses,
-    };
-
-    const json = JSON.stringify(rawAction);
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully publish actions data with status ${response.status}.`
-        );
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      onClick={handleCall}
-      style={{ width: "49.5%" }}
-      disabled={client == null || calling}
-      color="primary"
-      variant="contained"
-    >
-      {calling ? <CircularProgress size={24} /> : "Play Action"}
-    </Button>
-  );
-}
-
-function SaveButton() {
-  const client = useClient();
-  const logger = useLogger();
-
-  const [calling, handleCall] = useHandleProcess(() => {
-    const jsonActionsData = rawActionsDataGlobal;
-    const rawActions = {};
-    Object.keys(jsonActionsData).forEach((key) => {
-      const fixedPoses = [];
-      const rawPoses = jsonActionsData[key].poses;
-      for (let i = 0; i < rawPoses.length; i += 1) {
-        const jointsData = {};
-        for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
-          jointsData[rawPoses[i].joints[j].name] =
-            rawPoses[i].joints[j].pose_pos;
-        }
-        fixedPoses.push({
-          name: rawPoses[i].name,
-          pause: rawPoses[i].pause,
-          speed: rawPoses[i].speed,
-          joints: jointsData,
-        });
-      }
-      const action = {
-        name: jsonActionsData[key].name,
-        next: jsonActionsData[key].next,
-        start_delay: jsonActionsData[key].start_delay,
-        stop_delay: jsonActionsData[key].stop_delay,
-        poses: fixedPoses,
-      };
-      rawActions[jsonActionsData[key].name.toLowerCase()] = action;
-    });
-    const json = JSON.stringify(rawActions);
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully send actions data with status ${response.status}.`
-        );
-      })
-      .catch((err) => {
-        logger.error(`Failed to send data! ${err.message}.`);
-      });
-  }, 500);
-
-  return (
-    <Button
-      onClick={handleCall}
-      style={{ background: "#11cb5f", width: "49.5%", marginLeft: "1%" }}
-      disabled={client == null || calling}
-      color="primary"
-      variant="contained"
-    >
-      {calling ? <CircularProgress size={24} /> : "Save"}
-    </Button>
-  );
-}
-
-function ActionManager() {
-  return (
-    <NodeProvider nodeName="akushon_app">
-      <ClientProvider
-        serviceType="akushon_interfaces/srv/GetActions"
-        serviceName="/get_actions"
-      >
-        <ActionManagerForm />
-      </ClientProvider>
-      <Card>
-        <CardContent>
-          <div style={{ marginTop: -10, marginBottom: -25 }}>
-            <ClientProvider
-              serviceType="akushon_interfaces/srv/RunAction"
-              serviceName="/run_action"
-            >
-              <PlayButton />
-            </ClientProvider>
-            <ClientProvider
-              serviceType="akushon_interfaces/srv/SaveActions"
-              serviceName="/save_actions"
-            >
-              <SaveButton />
-            </ClientProvider>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent>
-          <div style={{ marginTop: -5 }}>
-            <PublisherProvider
-              messageType="tachimawari_interfaces/msg/SetJoints"
-              topicName="/joint/set_joints"
-            >
-              <SetJointsButton />
-            </PublisherProvider>
-            <PublisherProvider
-              messageType="tachimawari_interfaces/msg/SetTorques"
-              topicName="/joint/set_torques"
-            >
-              <SetTorquesButton />
-            </PublisherProvider>
-          </div>
         </CardContent>
       </Card>
     </NodeProvider>
