@@ -188,7 +188,7 @@ function GetActionsButton() {
       color="primary"
       variant="contained"
     >
-      {calling ? <CircularProgress size={24} /> : "Call"}
+      {calling ? <CircularProgress size={24} /> : "Get Actions"}
     </Button>
   );
 }
@@ -279,7 +279,7 @@ function SetJointsButton(props) {
     <Button
       onClick={handlePublish}
       disabled={publisher === null || publishing}
-      color={ typeButton === "to_robot" ? "default" : "primary" }
+      color={typeButton === "to_robot" ? "default" : "primary"}
       variant="contained"
       startIcon={
         typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
@@ -519,16 +519,16 @@ function ActionManager() {
               </div>
               <div style={{ marginTop: 10 }}>
                 <ClientProvider
-                  serviceType="akushon_interfaces/srv/GetActions"
-                  serviceName="/get_actions"
-                >
-                  <GetActionsButton />
-                </ClientProvider>
-                <ClientProvider
                   serviceType="akushon_interfaces/srv/SaveActions"
                   serviceName="/save_actions"
                 >
                   <SaveActionsButton />
+                </ClientProvider>
+                <ClientProvider
+                  serviceType="akushon_interfaces/srv/GetActions"
+                  serviceName="/get_actions"
+                >
+                  <GetActionsButton />
                 </ClientProvider>
               </div>
             </Grid>
