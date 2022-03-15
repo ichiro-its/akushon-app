@@ -16,7 +16,7 @@ function GetActionsButton() {
   const [calling, handleCall] = useHandleProcess(() => {
     setRequest("Request to get actions list");
     return client
-      .call({ request })
+      .call({ })
       .then((response) => {
         logger.success(`Successfully get actions data`);
         const jsonActionsData = JSON.parse(`${response.json}`);

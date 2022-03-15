@@ -18,8 +18,12 @@ function SetTorquesButton() {
   const [publishing, handlePublish] = useHandleProcess(() => {
     const ids = jointSelected;
     const torque_enable = state;
-    logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
-    return publisher
+    if (ids.length === 0) {
+      logger.warn(`No selected joints. Select some joint first to be set on/off.`);
+      return;
+    } else {
+      logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
+      return publisher
       .publish({ ids, torque_enable })
       .then(() => {
         logger.success(`Successfully publish set torques.`);
@@ -27,6 +31,7 @@ function SetTorquesButton() {
       .catch((err) => {
         logger.error(`Failed to publish set torques data! ${err.message}.`);
       });
+    }
   }, 500);
 
   useEffect(() => {

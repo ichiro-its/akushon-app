@@ -215,13 +215,13 @@ function ActionManager() {
               <div style={{ marginTop: 10 }}>
                 <ClientProvider
                   serviceType="akushon_interfaces/srv/SaveActions"
-                  serviceName="/save_actions"
+                  serviceName="/akushon/config/save_actions"
                 >
                   <SaveActionsButton />
                 </ClientProvider>
                 <ClientProvider
                   serviceType="akushon_interfaces/srv/GetActions"
-                  serviceName="/get_actions"
+                  serviceName="/akushon/config/get_actions"
                 >
                   <GetActionsButton />
                 </ClientProvider>
