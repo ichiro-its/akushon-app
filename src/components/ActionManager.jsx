@@ -354,6 +354,7 @@ function ActionManager() {
                     label="Speed"
                     variant="outlined"
                     margin="dense"
+                    type="number"
                     value={currentPose ? currentPose.speed : ""}
                     onChange={(event) => {
                       const newPose = {
@@ -375,6 +376,7 @@ function ActionManager() {
                     label="Pause"
                     variant="outlined"
                     margin="dense"
+                    type="number"
                     value={currentPose ? currentPose.pause : ""}
                     onChange={(event) => {
                       const newPose = {
