@@ -43,9 +43,8 @@ function SaveActionsButton() {
     const json = JSON.stringify(rawActions);
     if (actionsData.length === 0) {
       logger.warn(`No actions data. Call the actions data first.`);
-      return;
-    } else {
-      return client
+    }
+    return client
       .call({ json })
       .then((response) => {
         logger.success(
@@ -55,7 +54,6 @@ function SaveActionsButton() {
       .catch((err) => {
         logger.error(`Failed to send data! ${err.message}.`);
       });
-    }
   }, 500);
 
   return (

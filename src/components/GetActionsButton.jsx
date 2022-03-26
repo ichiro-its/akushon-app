@@ -2,7 +2,7 @@ import { Button, CircularProgress } from "@material-ui/core";
 
 import { useClient, useHandleProcess, useLogger } from "kumo-app";
 
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
 
@@ -10,13 +10,10 @@ function GetActionsButton() {
   const client = useClient();
   const logger = useLogger();
 
-  const { setActionsData } = useContext(ActionContext);
-  const [request, setRequest] = useState("");
-
   const [calling, handleCall] = useHandleProcess(() => {
-    setRequest("Request to get actions list");
+    const { setActionsData } = useContext(ActionContext);
     return client
-      .call({ })
+      .call({})
       .then((response) => {
         logger.success(`Successfully get actions data`);
         const jsonActionsData = JSON.parse(`${response.json}`);

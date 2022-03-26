@@ -15,33 +15,35 @@ function RunActionButton() {
   const [calling, handleCall] = useHandleProcess(() => {
     const fixedPoses = [];
     const rawPoses = currentAction.poses;
-  
+
     console.log(currentAction);
+
     if (Object.keys(currentAction).length === 0) {
       logger.warn(`No current action selected.`);
-    } else {
-      for (let i = 0; i < rawPoses.length; i += 1) {
-        const jointsData = {};
-        for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
-          jointsData[rawPoses[i].joints[j].name] = rawPoses[i].joints[j].pose_pos;
-        }
-        fixedPoses.push({
-          name: rawPoses[i].name,
-          pause: rawPoses[i].pause,
-          speed: rawPoses[i].speed,
-          joints: jointsData,
-        });
+    }
+
+    for (let i = 0; i < rawPoses.length; i += 1) {
+      const jointsData = {};
+      for (let j = 0; j < rawPoses[i].joints.length; j += 1) {
+        jointsData[rawPoses[i].joints[j].name] = rawPoses[i].joints[j].pose_pos;
       }
-      const rawAction = {
-        name: currentAction.name,
-        next: currentAction.next,
-        start_delay: currentAction.start_delay,
-        stop_delay: currentAction.stop_delay,
-        poses: fixedPoses,
-      };
-  
-      const json = JSON.stringify(rawAction);
-      return client
+      fixedPoses.push({
+        name: rawPoses[i].name,
+        pause: rawPoses[i].pause,
+        speed: rawPoses[i].speed,
+        joints: jointsData,
+      });
+    }
+    const rawAction = {
+      name: currentAction.name,
+      next: currentAction.next,
+      start_delay: currentAction.start_delay,
+      stop_delay: currentAction.stop_delay,
+      poses: fixedPoses,
+    };
+
+    const json = JSON.stringify(rawAction);
+    return client
       .call({ json })
       .then((response) => {
         logger.success(
@@ -51,7 +53,6 @@ function RunActionButton() {
       .catch((err) => {
         logger.error(`Failed to publish data! ${err.message}.`);
       });
-    }
   }, 500);
 
   return (
