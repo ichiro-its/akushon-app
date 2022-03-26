@@ -9,9 +9,10 @@ import ActionContext from "../context/ActionContext";
 function GetActionsButton() {
   const client = useClient();
   const logger = useLogger();
+  const { setActionsData } = useContext(ActionContext);
 
   const [calling, handleCall] = useHandleProcess(() => {
-    const { setActionsData } = useContext(ActionContext);
+    console.log("test");
     return client
       .call({})
       .then((response) => {
