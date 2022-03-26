@@ -26,8 +26,8 @@ function SaveActionsButton() {
         }
         fixedPoses.push({
           name: rawPoses[i].name,
-          pause: rawPoses[i].pause,
-          speed: rawPoses[i].speed,
+          pause: parseFloat(rawPoses[i].pause),
+          speed: parseFloat(rawPoses[i].speed),
           joints: jointsData,
         });
       }
