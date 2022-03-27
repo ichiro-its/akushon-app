@@ -20,6 +20,7 @@ function RunActionButton() {
 
     if (Object.keys(currentAction).length === 0) {
       logger.warn(`No current action selected.`);
+      return client;
     }
 
     for (let i = 0; i < rawPoses.length; i += 1) {

@@ -43,6 +43,7 @@ function SaveActionsButton() {
     const json = JSON.stringify(rawActions);
     if (actionsData.length === 0) {
       logger.warn(`No actions data. Call the actions data first.`);
+      return client;
     }
     return client
       .call({ json })
