@@ -20,7 +20,7 @@ function SetJointsButton(props) {
     const joints = [];
     for (let i = 0; i < jointPoseData.length; i += 1) {
       joints.push({
-        id: i,
+        id: jointPoseData[i].id,
         position: jointPoseData[i].pose_pos,
       });
     }
