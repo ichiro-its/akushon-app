@@ -22,6 +22,7 @@ function SetTorquesButton() {
       logger.warn(
         `No selected joints. Select some joint first to be set on/off.`
       );
+      return publisher;
     }
 
     logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);

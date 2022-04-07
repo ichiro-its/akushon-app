@@ -16,6 +16,8 @@ function SetJointsButton(props) {
 
   const { jointPoseData } = useContext(ActionContext);
 
+  console.log(jointPoseData);
+
   const [publishing, handlePublish] = useHandleProcess(() => {
     const joints = [];
     for (let i = 0; i < jointPoseData.length; i += 1) {
@@ -24,8 +26,11 @@ function SetJointsButton(props) {
         position: jointPoseData[i].pose_pos,
       });
     }
+
+    const control_type = 3;
+
     return publisher
-      .publish({ joints })
+      .publish({ control_type, joints })
       .then(() => {
         logger.success(`Successfully publish set joints.`);
       })

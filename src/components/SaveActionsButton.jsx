@@ -26,8 +26,8 @@ function SaveActionsButton() {
         }
         fixedPoses.push({
           name: rawPoses[i].name,
-          pause: rawPoses[i].pause,
-          speed: rawPoses[i].speed,
+          pause: parseFloat(rawPoses[i].pause),
+          speed: parseFloat(rawPoses[i].speed),
           joints: jointsData,
         });
       }
@@ -43,6 +43,7 @@ function SaveActionsButton() {
     const json = JSON.stringify(rawActions);
     if (actionsData.length === 0) {
       logger.warn(`No actions data. Call the actions data first.`);
+      return client;
     }
     return client
       .call({ json })

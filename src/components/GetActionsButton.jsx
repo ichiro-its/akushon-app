@@ -12,7 +12,7 @@ function GetActionsButton() {
   const { setActionsData } = useContext(ActionContext);
 
   const [calling, handleCall] = useHandleProcess(() => {
-    console.log("test");
+    console.log("Get actions now...");
     return client
       .call({})
       .then((response) => {
