@@ -18,6 +18,7 @@ function App() {
   const [actionsData, setActionsData] = useState([]);
   const [posesData, setPosesData] = useState([]);
   const [jointPoseData, setJointPoseData] = useState([]);
+  const [jointRobotData, setJointRobotData] = useState([]);
   const [jointSelected, setJointSelected] = useState([]);
   const [currentAction, setCurrentAction] = useState({});
   const [currentPose, setCurrentPose] = useState({});
@@ -28,12 +29,14 @@ function App() {
         actionsData,
         posesData,
         jointPoseData,
+        jointRobotData,
         jointSelected,
         currentAction,
         currentPose,
         setActionsData,
         setPosesData,
         setJointPoseData,
+        setJointRobotData,
         setJointSelected,
         setCurrentAction,
         setCurrentPose,

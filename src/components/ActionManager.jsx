@@ -6,7 +6,12 @@ import { DataGrid } from "@material-ui/data-grid";
 import MuiTypography from "@material-ui/core/Typography";
 import { Button, Card, CardContent, Grid, TextField } from "@material-ui/core";
 
-import { ClientProvider, NodeProvider, PublisherProvider } from "kumo-app";
+import {
+  ClientProvider,
+  NodeProvider,
+  PublisherProvider,
+  useLogger,
+} from "kumo-app";
 
 import React, { useContext } from "react";
 
@@ -78,11 +83,6 @@ const poseColumns = [
   },
 ];
 
-const initJointRobotData = [
-  { id: 0, name: "left_shoulder", robot_pos: 0 },
-  { id: 1, name: "right_shoulder", robot_pos: 0 },
-];
-
 const jointPoseColumns = [
   { field: "name", headerName: "Name", width: 140, sortable: false },
   {
@@ -98,7 +98,7 @@ const jointPoseColumns = [
 const jointRobotColumns = [
   { field: "name", headerName: "Name", width: 140, sortable: false },
   {
-    field: "robot_pos",
+    field: "pose_pos",
     headerName: "Robot Pos",
     width: 100,
     type: "number",
@@ -135,17 +135,19 @@ function ActionManager() {
     actionsData,
     posesData,
     jointPoseData,
+    jointRobotData,
     currentAction,
     currentPose,
     setActionsData,
     setPosesData,
     setJointPoseData,
+    setJointRobotData,
     setJointSelected,
     setCurrentAction,
     setCurrentPose,
   } = useContext(ActionContext);
 
-  const jointRobotData = initJointRobotData;
+  const logger = useLogger();
 
   const handleClickedAction = (event) => {
     setCurrentAction(event.row);
@@ -201,11 +203,11 @@ function ActionManager() {
     updateActionsData(newAction);
   };
 
-  const updateJointPoseData = (newJoints) => {
+  const updateJointPoseData = (newJoints, index) => {
     const newJointPoseData = [
-      ...jointPoseData.slice(0, newJoints.id),
+      ...jointPoseData.slice(0, index),
       newJoints,
-      ...jointPoseData.slice(newJoints.id + 1),
+      ...jointPoseData.slice(index + 1),
     ];
     setJointPoseData(newJointPoseData);
 
@@ -217,6 +219,33 @@ function ActionManager() {
       joints: newJointPoseData,
     };
     updatePosesData(newPose);
+  };
+
+  const updateJointRobotData = (newJoints, index) => {
+    const newJointRobotData = [
+      ...jointRobotData.slice(0, index),
+      newJoints,
+      ...jointRobotData.slice(index + 1),
+    ];
+    setJointRobotData(newJointRobotData);
+    logger.success("Send data directly to robot!"); // to do(finesaaa): change DataGrid JointRobot to component itself with SetJointPublisher
+  };
+
+  const setJointRobotToPoseData = () => {
+    if (jointRobotData.length !== 0) {
+      setJointPoseData(jointRobotData);
+
+      const newPose = {
+        id: currentPose.id,
+        name: currentPose.name,
+        speed: currentPose.speed,
+        pause: currentPose.pause,
+        joints: jointRobotData,
+      };
+      updatePosesData(newPose);
+    } else {
+      logger.error("Joint robot data is empty!");
+    }
   };
 
   return (
@@ -444,12 +473,15 @@ function ActionManager() {
                   columns={jointPoseColumns}
                   rowHeight={25}
                   onCellEditCommit={(event) => {
+                    const index = jointPoseData.findIndex(
+                      (joint) => joint.id === event.id
+                    );
                     const newJoints = {
-                      id: jointPoseData[event.id].id,
-                      name: jointPoseData[event.id].name,
+                      id: jointPoseData[index].id,
+                      name: jointPoseData[index].name,
                       pose_pos: event.value,
                     };
-                    updateJointPoseData(newJoints);
+                    updateJointPoseData(newJoints, index);
                   }}
                   disableColumnMenu
                   onStateChange={(event) => {
@@ -474,6 +506,17 @@ function ActionManager() {
                   rows={jointRobotData}
                   columns={jointRobotColumns}
                   rowHeight={25}
+                  onCellEditCommit={(event) => {
+                    const index = jointRobotData.findIndex(
+                      (joint) => joint.id === event.id
+                    );
+                    const newJoints = {
+                      id: jointRobotData[index].id,
+                      name: jointRobotData[index].name,
+                      pose_pos: event.value,
+                    };
+                    updateJointRobotData(newJoints, index);
+                  }}
                   disableColumnMenu
                   onStateChange={(event) => {
                     setJointSelected(event.state.selection);
@@ -488,6 +531,7 @@ function ActionManager() {
                   color="default"
                   className="button"
                   startIcon={<ArrowBackIcon />}
+                  onClick={setJointRobotToPoseData}
                 />
                 <PublisherProvider
                   messageType="tachimawari_interfaces/msg/SetTorques"
