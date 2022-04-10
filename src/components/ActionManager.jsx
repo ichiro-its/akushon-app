@@ -22,6 +22,7 @@ import SetJointsButton from "./SetJointsButton";
 import GetActionsButton from "./GetActionsButton";
 import RunActionButton from "./RunActionButton";
 import SaveActionsButton from "./SaveActionsButton";
+import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
 
 const actionColumns = [
   {
@@ -95,18 +96,6 @@ const jointPoseColumns = [
   },
 ];
 
-const jointRobotColumns = [
-  { field: "name", headerName: "Name", width: 140, sortable: false },
-  {
-    field: "pose_pos",
-    headerName: "Robot Pos",
-    width: 100,
-    type: "number",
-    editable: true,
-    sortable: false,
-  },
-];
-
 const jointIdList = {
   right_shoulder_pitch: 1,
   left_shoulder_pitch: 2,
@@ -141,7 +130,6 @@ function ActionManager() {
     setActionsData,
     setPosesData,
     setJointPoseData,
-    setJointRobotData,
     setJointSelected,
     setCurrentAction,
     setCurrentPose,
@@ -219,16 +207,6 @@ function ActionManager() {
       joints: newJointPoseData,
     };
     updatePosesData(newPose);
-  };
-
-  const updateJointRobotData = (newJoints, index) => {
-    const newJointRobotData = [
-      ...jointRobotData.slice(0, index),
-      newJoints,
-      ...jointRobotData.slice(index + 1),
-    ];
-    setJointRobotData(newJointRobotData);
-    logger.success("Send data directly to robot!"); // to do(finesaaa): change DataGrid JointRobot to component itself with SetJointPublisher
   };
 
   const setJointRobotToPoseData = () => {
@@ -502,28 +480,12 @@ function ActionManager() {
             </Grid>
             <Grid item xs={6} lg={3}>
               <div style={{ height: 680, width: "100%" }}>
-                <DataGrid
-                  rows={jointRobotData}
-                  columns={jointRobotColumns}
-                  rowHeight={25}
-                  onCellEditCommit={(event) => {
-                    const index = jointRobotData.findIndex(
-                      (joint) => joint.id === event.id
-                    );
-                    const newJoints = {
-                      id: jointRobotData[index].id,
-                      name: jointRobotData[index].name,
-                      pose_pos: event.value,
-                    };
-                    updateJointRobotData(newJoints, index);
-                  }}
-                  disableColumnMenu
-                  onStateChange={(event) => {
-                    setJointSelected(event.state.selection);
-                  }}
-                  checkboxSelection
-                  rowsPerPageOptions={[]}
-                />
+                <PublisherProvider
+                  messageType="tachimawari_interfaces/msg/SetJoints"
+                  topicName="/joint/set_joints"
+                >
+                  <SetJointsOnCellEdit />
+                </PublisherProvider>
               </div>
               <div style={{ marginTop: 10, float: "left" }}>
                 <Button
