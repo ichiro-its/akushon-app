@@ -10,7 +10,7 @@ function SetTorquesButton() {
   const publisher = usePublisher();
   const logger = useLogger();
 
-  const { jointSelected } = useContext(ActionContext);
+  const { jointSelected, setJointRobotData, jointRobotData } = useContext(ActionContext);
 
   const [state, setState] = useState(true);
   const [changed, setChanged] = useState(false);
@@ -23,6 +23,26 @@ function SetTorquesButton() {
         `No selected joints. Select some joint first to be set on/off.`
       );
       return publisher;
+    } else {
+      var newJointRobotData = jointRobotData;
+      for (let i = 0; i < ids.length; i += 1) {
+        const index = jointRobotData.findIndex(
+          (joint) => joint.id === ids[i]
+        );
+        const newJoint = {
+          id: jointRobotData[index].id,
+          name: jointRobotData[index].name,
+          pose_pos: jointRobotData[index].pose_pos,
+          status: torque_enable ? "ON" : "OFF",
+        };
+        newJointRobotData = [
+          ...newJointRobotData.slice(0, index),
+          newJoint,
+          ...newJointRobotData.slice(index + 1),
+        ];
+      }
+      setJointRobotData(newJointRobotData);
+      console.log("Set!");
     }
 
     logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);

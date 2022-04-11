@@ -16,14 +16,21 @@ function SetJointsButton(props) {
 
   const { setJointRobotData, jointPoseData } = useContext(ActionContext);
 
-  console.log(jointPoseData);
-
   const [publishing, handlePublish] = useHandleProcess(() => {
     const joints = [];
 
     if (typeButton === "to_robot") {
       logger.info(`Change the joint robot data.`);
-      setJointRobotData(jointPoseData);
+      const newJointRobotData = [];
+      for (let i = 0; i < jointPoseData.length; i += 1) {
+        newJointRobotData.push({
+          id: jointPoseData[i].id,
+          name: jointPoseData[i].name,
+          pose_pos: jointPoseData[i].pose_pos,
+          status: "ON",
+        });
+      }
+      setJointRobotData(newJointRobotData);
     }
 
     for (let i = 0; i < jointPoseData.length; i += 1) {

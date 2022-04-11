@@ -213,7 +213,15 @@ function ActionManager() {
 
   const setJointRobotToPoseData = () => {
     if (jointRobotData.length !== 0) {
-      setJointPoseData(jointRobotData);
+      const newJointPoseData = [];
+      for (let i = 0; i < jointRobotData.length; i += 1) {
+        newJointPoseData.push({
+          id: jointRobotData[i].id,
+          name: jointRobotData[i].name,
+          pose_pos: jointRobotData[i].pose_pos,
+        });
+      }
+      setJointPoseData(newJointPoseData);
 
       const newPose = {
         id: currentPose.id,
@@ -236,6 +244,7 @@ function ActionManager() {
         id: currentJoints[i].id,
         name: Object.keys(jointIdList).find((key) => jointIdList[key] === currentJoints[i].id),
         pose_pos: currentJoints[i].position,
+        status: "ON",
       });
     }
     setJointRobotData(currentJointRobotData);
@@ -477,10 +486,10 @@ function ActionManager() {
                     updateJointPoseData(newJoints, index);
                   }}
                   disableColumnMenu
-                  onStateChange={(event) => {
-                    setJointSelected(event.state.selection);
-                  }}
-                  checkboxSelection
+                  // onStateChange={(event) => {
+                  //   setJointSelected(event.state.selection);
+                  // }}
+                  // checkboxSelection
                   rowsPerPageOptions={[]}
                 />
               </div>

@@ -15,6 +15,7 @@ const jointRobotColumns = [
     editable: true,
     sortable: false,
   },
+  { field: "status", headerName: "Status", width: 140, sortable: false },
 ];
 
 function SetJointsOnCellEdit() {
@@ -23,7 +24,6 @@ function SetJointsOnCellEdit() {
 
   const { setJointRobotData, jointRobotData, setJointSelected } =
     useContext(ActionContext);
-  console.log(jointRobotData);
 
   const updateJointRobotData = (newJoints, index) => {
     const newJointRobotData = [
@@ -58,7 +58,7 @@ function SetJointsOnCellEdit() {
   }, 500);
 
   if (publishing) {
-    console.log("ublishing...");
+    console.log("Publishing...");
   }
 
   return (
@@ -74,6 +74,7 @@ function SetJointsOnCellEdit() {
           id: jointRobotData[index].id,
           name: jointRobotData[index].name,
           pose_pos: event.value,
+          status: "ON",
         };
         updateJointRobotData(newJoints, index);
         handlePublish();
