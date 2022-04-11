@@ -42,7 +42,6 @@ function SetTorquesButton() {
         ];
       }
       setJointRobotData(newJointRobotData);
-      console.log("Set!");
     }
 
     logger.info(`Set torques ${torque_enable}, ids: ${ids}.`);
