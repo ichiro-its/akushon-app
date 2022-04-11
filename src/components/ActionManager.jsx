@@ -518,19 +518,25 @@ function ActionManager() {
                 </SubscriptionProvider>
               </div>
               <div style={{ marginTop: 10, float: "left" }}>
-                <Button
-                  variant="contained"
-                  color="default"
-                  className="button"
-                  startIcon={<ArrowBackIcon />}
-                  onClick={setJointRobotToPoseData}
-                />
-                <PublisherProvider
-                  messageType="tachimawari_interfaces/msg/SetTorques"
-                  topicName="/joint/set_torques"
-                >
-                  <SetTorquesButton />
-                </PublisherProvider>
+              <Grid container spacing={1}>
+                <Grid item xs={4}>
+                  <Button
+                    variant="contained"
+                    color="default"
+                    className="button"
+                    startIcon={<ArrowBackIcon />}
+                    onClick={setJointRobotToPoseData}
+                  />
+                </Grid>
+                <Grid item xs={8}>
+                  <PublisherProvider
+                    messageType="tachimawari_interfaces/msg/SetTorques"
+                    topicName="/joint/set_torques"
+                  >
+                    <SetTorquesButton />
+                  </PublisherProvider>
+                </Grid>
+              </Grid>
               </div>
             </Grid>
           </Grid>

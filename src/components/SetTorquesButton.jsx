@@ -1,4 +1,6 @@
-import { CircularProgress, FormControlLabel, Switch } from "@material-ui/core";
+import { Button, CircularProgress, Grid } from "@material-ui/core";
+import WbIncandescentRoundedIcon from "@material-ui/icons/WbIncandescentRounded";
+import WbIncandescentOutlinedIcon from "@material-ui/icons/WbIncandescentOutlined";
 
 import { useHandleProcess, useLogger, usePublisher } from "kumo-app";
 
@@ -14,10 +16,14 @@ function SetTorquesButton() {
 
   const [state, setState] = useState(true);
   const [changed, setChanged] = useState(false);
+  const [on, setOn] = useState(false);
+  const [off, setOff] = useState(false);
 
   const [publishing, handlePublish] = useHandleProcess(() => {
     const ids = jointSelected;
     const torque_enable = state;
+    setOff(false);
+    setOn(false);
     if (ids.length === 0) {
       logger.warn(
         `No selected joints. Select some joint first to be set on/off.`
@@ -62,30 +68,43 @@ function SetTorquesButton() {
     }
   });
 
-  const handleChange = (event) => {
-    setState(event.target.checked);
+  const onTorques = () => {
+    setState(true);
+    setOn(true);
+    setChanged(true);
+  };
+
+  const offTorques = () => {
+    setState(false);
+    setOff(true);
     setChanged(true);
   };
 
   return (
-    <FormControlLabel
-      style={{ marginTop: -4, marginLeft: 10 }}
-      control={
-        publishing ? (
-          <CircularProgress size={24} />
-        ) : (
-          <Switch
-            checked={state}
-            onChange={handleChange}
-            name="checked"
-            color="primary"
-            aria-label="torque"
-          />
-        )
-      }
-      label="On Torques"
-      fullwidth="true"
-    />
+    <Grid container spacing={1}>
+      <Grid item xs={6}>
+        <Button
+          style={{ marginLeft: 20 }}
+          onClick={onTorques}
+          color="primary"
+          variant={on ? "outlined" : "contained"}
+          startIcon={<WbIncandescentRoundedIcon />}
+          >
+          {on ? <CircularProgress size={24} /> : "ON"}
+        </Button>
+      </Grid>
+      <Grid item xs={6}>
+        <Button
+          style={{ marginLeft: 20 }}
+          onClick={offTorques}
+          color="default"
+          variant={off ? "outlined" : "contained"}
+          startIcon={<WbIncandescentOutlinedIcon />}
+        >
+          {off ? <CircularProgress size={24} /> : "OFF"}
+        </Button>
+      </Grid>
+    </Grid>
   );
 }
 
