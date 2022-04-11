@@ -244,7 +244,7 @@ function ActionManager() {
         id: currentJoints[i].id,
         name: Object.keys(jointIdList).find((key) => jointIdList[key] === currentJoints[i].id),
         pose_pos: currentJoints[i].position,
-        status: "ON", // todo(finesaaa) : get from tachimawari, need to change
+        status: jointRobotData[i].status, // todo(finesaaa) : get from tachimawari, need to change
       });
     }
     setJointRobotData(currentJointRobotData);
