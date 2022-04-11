@@ -132,7 +132,6 @@ function ActionManager() {
     setPosesData,
     setJointPoseData,
     setJointRobotData,
-    setJointSelected,
     setCurrentAction,
     setCurrentPose,
   } = useContext(ActionContext);
@@ -242,13 +241,15 @@ function ActionManager() {
     for (let i = 0; i < currentJoints.length; i += 1) {
       currentJointRobotData.push({
         id: currentJoints[i].id,
-        name: Object.keys(jointIdList).find((key) => jointIdList[key] === currentJoints[i].id),
+        name: Object.keys(jointIdList).find(
+          (key) => jointIdList[key] === currentJoints[i].id
+        ),
         pose_pos: currentJoints[i].position,
-        status: jointRobotData[i].status, // todo(finesaaa) : get from tachimawari, need to change
+        status: jointRobotData[i].status, // todo(finesaaa) : need to be check
       });
     }
     setJointRobotData(currentJointRobotData);
-  }
+  };
 
   return (
     <NodeProvider nodeName="akushon_app">
@@ -486,10 +487,6 @@ function ActionManager() {
                     updateJointPoseData(newJoints, index);
                   }}
                   disableColumnMenu
-                  // onStateChange={(event) => {
-                  //   setJointSelected(event.state.selection);
-                  // }}
-                  // checkboxSelection
                   rowsPerPageOptions={[]}
                 />
               </div>
@@ -514,29 +511,28 @@ function ActionManager() {
                   messageType="tachimawari_interfaces/msg/CurrentJoints"
                   topicName="/joint/current_joints"
                   callback={subscriptionCurrentJointsCallback}
-                >
-                </SubscriptionProvider>
+                />
               </div>
               <div style={{ marginTop: 10, float: "left" }}>
-              <Grid container spacing={1}>
-                <Grid item xs={4}>
-                  <Button
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<ArrowBackIcon />}
-                    onClick={setJointRobotToPoseData}
-                  />
+                <Grid container spacing={1}>
+                  <Grid item xs={4}>
+                    <Button
+                      variant="contained"
+                      color="default"
+                      className="button"
+                      startIcon={<ArrowBackIcon />}
+                      onClick={setJointRobotToPoseData}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <PublisherProvider
+                      messageType="tachimawari_interfaces/msg/SetTorques"
+                      topicName="/joint/set_torques"
+                    >
+                      <SetTorquesButton />
+                    </PublisherProvider>
+                  </Grid>
                 </Grid>
-                <Grid item xs={8}>
-                  <PublisherProvider
-                    messageType="tachimawari_interfaces/msg/SetTorques"
-                    topicName="/joint/set_torques"
-                  >
-                    <SetTorquesButton />
-                  </PublisherProvider>
-                </Grid>
-              </Grid>
               </div>
             </Grid>
           </Grid>

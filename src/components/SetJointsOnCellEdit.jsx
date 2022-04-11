@@ -32,7 +32,6 @@ function SetJointsOnCellEdit() {
       ...jointRobotData.slice(index + 1),
     ];
     setJointRobotData(newJointRobotData);
-    logger.success("Send data directly to robot!"); // to do(finesaaa): change DataGrid JointRobot to component itself with SetJointPublisher
   };
 
   const [publishing, handlePublish] = useHandleProcess(() => {
@@ -47,19 +46,19 @@ function SetJointsOnCellEdit() {
 
     const control_type = 3;
 
+    if (publishing) {
+      logger.info("Publishing...");
+    }
+
     return publisher
       .publish({ control_type, joints })
       .then(() => {
-        logger.success(`Successfully publish set joints robot.`);
+        logger.success(`Successfully publish set joints directly to robot.`);
       })
       .catch((err) => {
         logger.error(`Failed to publish set joints robot! ${err.message}.`);
       });
   }, 500);
-
-  if (publishing) {
-    console.log("Publishing...");
-  }
 
   return (
     <DataGrid
@@ -74,7 +73,7 @@ function SetJointsOnCellEdit() {
           id: jointRobotData[index].id,
           name: jointRobotData[index].name,
           pose_pos: event.value,
-          status: "ON",
+          status: jointRobotData[index].status,
         };
         updateJointRobotData(newJoints, index);
         handlePublish();

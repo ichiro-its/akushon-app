@@ -16,8 +16,6 @@ function RunActionButton() {
     const fixedPoses = [];
     const rawPoses = currentAction.poses;
 
-    console.log(currentAction);
-
     if (Object.keys(currentAction).length === 0) {
       logger.warn(`No current action selected.`);
       return client;
