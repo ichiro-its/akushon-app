@@ -10,6 +10,7 @@ import {
   ClientProvider,
   NodeProvider,
   PublisherProvider,
+  SubscriptionProvider,
   useLogger,
 } from "kumo-app";
 
@@ -130,6 +131,7 @@ function ActionManager() {
     setActionsData,
     setPosesData,
     setJointPoseData,
+    setJointRobotData,
     setJointSelected,
     setCurrentAction,
     setCurrentPose,
@@ -225,6 +227,19 @@ function ActionManager() {
       logger.error("Joint robot data is empty!");
     }
   };
+
+  const subscriptionCurrentJointsCallback = (message) => {
+    const currentJoints = message.joints;
+    const currentJointRobotData = [];
+    for (let i = 0; i < currentJoints.length; i += 1) {
+      currentJointRobotData.push({
+        id: currentJoints[i].id,
+        name: Object.keys(jointIdList).find((key) => jointIdList[key] === currentJoints[i].id),
+        pose_pos: currentJoints[i].position,
+      });
+    }
+    setJointRobotData(currentJointRobotData);
+  }
 
   return (
     <NodeProvider nodeName="akushon_app">
@@ -486,6 +501,12 @@ function ActionManager() {
                 >
                   <SetJointsOnCellEdit />
                 </PublisherProvider>
+                <SubscriptionProvider
+                  messageType="tachimawari_interfaces/msg/CurrentJoints"
+                  topicName="/joint/current_joints"
+                  callback={subscriptionCurrentJointsCallback}
+                >
+                </SubscriptionProvider>
               </div>
               <div style={{ marginTop: 10, float: "left" }}>
                 <Button
