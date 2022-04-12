@@ -10,7 +10,6 @@ import {
   ClientProvider,
   NodeProvider,
   PublisherProvider,
-  SubscriptionProvider,
   useLogger,
 } from "kumo-app";
 
@@ -24,6 +23,7 @@ import GetActionsButton from "./GetActionsButton";
 import RunActionButton from "./RunActionButton";
 import SaveActionsButton from "./SaveActionsButton";
 import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
+import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
 
 const actionColumns = [
   {
@@ -131,7 +131,6 @@ function ActionManager() {
     setActionsData,
     setPosesData,
     setJointPoseData,
-    setJointRobotData,
     setCurrentAction,
     setCurrentPose,
   } = useContext(ActionContext);
@@ -233,22 +232,6 @@ function ActionManager() {
     } else {
       logger.error("Joint robot data is empty!");
     }
-  };
-
-  const subscriptionCurrentJointsCallback = (message) => {
-    const currentJoints = message.joints;
-    const currentJointRobotData = [];
-    for (let i = 0; i < currentJoints.length; i += 1) {
-      currentJointRobotData.push({
-        id: currentJoints[i].id,
-        name: Object.keys(jointIdList).find(
-          (key) => jointIdList[key] === currentJoints[i].id
-        ),
-        pose_pos: currentJoints[i].position,
-        status: jointRobotData[i].status, // todo(finesaaa) : need to be check
-      });
-    }
-    setJointRobotData(currentJointRobotData);
   };
 
   return (
@@ -507,11 +490,7 @@ function ActionManager() {
                 >
                   <SetJointsOnCellEdit />
                 </PublisherProvider>
-                <SubscriptionProvider
-                  messageType="tachimawari_interfaces/msg/CurrentJoints"
-                  topicName="/joint/current_joints"
-                  callback={subscriptionCurrentJointsCallback}
-                />
+                <SubscriptionCurrentJoints />
               </div>
               <div style={{ marginTop: 10, float: "left" }}>
                 <Grid container spacing={1}>

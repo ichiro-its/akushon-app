@@ -22,6 +22,7 @@ function App() {
   const [jointSelected, setJointSelected] = useState([]);
   const [currentAction, setCurrentAction] = useState({});
   const [currentPose, setCurrentPose] = useState({});
+  const [isTorquesChanged, setIsTorquesChanged] = useState(false);
 
   return (
     <ActionContext.Provider
@@ -33,6 +34,7 @@ function App() {
         jointSelected,
         currentAction,
         currentPose,
+        isTorquesChanged,
         setActionsData,
         setPosesData,
         setJointPoseData,
@@ -40,6 +42,7 @@ function App() {
         setJointSelected,
         setCurrentAction,
         setCurrentPose,
+        setIsTorquesChanged,
       }}
     >
       <div className="root">

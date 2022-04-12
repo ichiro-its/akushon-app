@@ -12,8 +12,13 @@ function SetTorquesButton() {
   const publisher = usePublisher();
   const logger = useLogger();
 
-  const { jointSelected, setJointRobotData, jointRobotData } =
-    useContext(ActionContext);
+  const {
+    jointSelected,
+    setJointRobotData,
+    jointRobotData,
+    isTorquesChanged,
+    setIsTorquesChanged,
+  } = useContext(ActionContext);
 
   var newJointRobotData = jointRobotData;
   const [state, setState] = useState(true);
@@ -56,11 +61,14 @@ function SetTorquesButton() {
       .publish({ ids, torque_enable })
       .then(() => {
         logger.success(`Successfully publish set torques.`);
+        setIsTorquesChanged(true);
       })
       .catch((err) => {
         logger.error(`Failed to publish set torques data! ${err.message}.`);
       });
   }, 500);
+
+  console.log(isTorquesChanged);
 
   useEffect(() => {
     if (changed) {
