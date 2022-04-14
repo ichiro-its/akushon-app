@@ -1,4 +1,4 @@
-import { SubscriptionProvider, useLogger } from "kumo-app";
+import { SubscriptionProvider } from "kumo-app";
 
 import React, { useContext, useState, useEffect } from "react";
 
