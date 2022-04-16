@@ -151,13 +151,15 @@ function ActionManager() {
     const currentPoses = posesData[event.row.id];
 
     const currentJointPoseData = [];
-    for (let i = 0; i < currentPoses.joints.length; i += 1) {
+
+    Object.keys(jointIdList).forEach((key) => {
+      const idJoint = jointIdList[key];
       currentJointPoseData.push({
-        id: jointIdList[currentPoses.joints[i].name],
-        name: currentPoses.joints[i].name,
-        pose_pos: currentPoses.joints[i].pose_pos,
+        id: idJoint,
+        name: key,
+        pose_pos: currentPoses.joints[idJoint - 1].pose_pos,
       });
-    }
+    });
     setJointPoseData(currentJointPoseData);
   };
 

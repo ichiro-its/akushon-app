@@ -16,16 +16,16 @@ function SetTorquesButton() {
     useContext(ActionContext);
 
   var newJointRobotData = jointRobotData;
-  const [state, setState] = useState(true);
-  const [changed, setChanged] = useState(false);
-  const [on, setOn] = useState(false);
-  const [off, setOff] = useState(false);
+  const [isTorquesEnabled, setIsTorquesEnabled] = useState(true);
+  const [isTorquesChanged, setIsTorquesChanged] = useState(false);
+  const [onTorquesClicked, setOnTorquesClicked] = useState(false);
+  const [offTorquesClicked, setOffTorquesClicked] = useState(false);
 
   const [publishing, handlePublish] = useHandleProcess(() => {
     const ids = jointSelected;
-    const torque_enable = state;
-    setOff(false);
-    setOn(false);
+    const torque_enable = isTorquesEnabled;
+    setOffTorquesClicked(false);
+    setOnTorquesClicked(false);
     if (ids.length === 0) {
       logger.warn(
         `No selected joints. Select some joint first to be set on/off.`
@@ -63,22 +63,22 @@ function SetTorquesButton() {
   }, 500);
 
   useEffect(() => {
-    if (changed) {
+    if (isTorquesChanged) {
       handlePublish();
-      setChanged(false);
+      setIsTorquesChanged(false);
     }
   });
 
-  const onTorques = () => {
-    setState(true);
-    setOn(true);
-    setChanged(true);
+  const handleOnTorquesClicked = () => {
+    setIsTorquesEnabled(true);
+    setOnTorquesClicked(true);
+    setIsTorquesChanged(true);
   };
 
-  const offTorques = () => {
-    setState(false);
-    setOff(true);
-    setChanged(true);
+  const handleOffTorquesClicked = () => {
+    setIsTorquesEnabled(false);
+    setOffTorquesClicked(true);
+    setIsTorquesChanged(true);
   };
 
   return (
@@ -86,23 +86,23 @@ function SetTorquesButton() {
       <Grid item xs={6}>
         <Button
           style={{ marginLeft: 20 }}
-          onClick={onTorques}
+          onClick={handleOnTorquesClicked}
           color="primary"
-          variant={on ? "outlined" : "contained"}
+          variant={onTorquesClicked ? "outlined" : "contained"}
           startIcon={<WbIncandescentRoundedIcon />}
         >
-          {on ? <CircularProgress size={24} /> : "ON"}
+          {onTorquesClicked ? <CircularProgress size={24} /> : "ON"}
         </Button>
       </Grid>
       <Grid item xs={6}>
         <Button
           style={{ marginLeft: 20 }}
-          onClick={offTorques}
+          onClick={handleOffTorquesClicked}
           color="default"
-          variant={off ? "outlined" : "contained"}
+          variant={offTorquesClicked ? "outlined" : "contained"}
           startIcon={<WbIncandescentOutlinedIcon />}
         >
-          {off ? <CircularProgress size={24} /> : "OFF"}
+          {offTorquesClicked ? <CircularProgress size={24} /> : "OFF"}
         </Button>
       </Grid>
     </Grid>
