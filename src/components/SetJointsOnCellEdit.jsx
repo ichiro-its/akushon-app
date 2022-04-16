@@ -6,6 +6,14 @@ import React, { useContext } from "react";
 import ActionContext from "../context/ActionContext";
 
 const jointRobotColumns = [
+  {
+    field: "id",
+    headerName: "Id",
+    width: 50,
+    type: "number",
+    sortable: false,
+    editable: false,
+  },
   { field: "name", headerName: "Name", width: 140, sortable: false },
   {
     field: "pose_pos",
