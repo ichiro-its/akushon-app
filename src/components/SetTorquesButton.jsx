@@ -15,7 +15,7 @@ function SetTorquesButton() {
   const { jointSelected, setJointRobotData, jointRobotData } =
     useContext(ActionContext);
 
-  var newJointRobotData = jointRobotData;
+  let newJointRobotData = jointRobotData;
   const [isTorquesEnabled, setIsTorquesEnabled] = useState(true);
   const [isTorquesChanged, setIsTorquesChanged] = useState(false);
   const [onTorquesClicked, setOnTorquesClicked] = useState(false);
@@ -63,11 +63,9 @@ function SetTorquesButton() {
   }, 500);
 
   useEffect(() => {
-    if (isTorquesChanged) {
-      handlePublish();
-      setIsTorquesChanged(false);
-    }
-  });
+    handlePublish();
+    setIsTorquesChanged(false);
+  }, [isTorquesChanged]);
 
   const handleOnTorquesClicked = () => {
     setIsTorquesEnabled(true);
