@@ -6,6 +6,29 @@ import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
 
+const jointIdList = {
+  right_shoulder_pitch: 1,
+  left_shoulder_pitch: 2,
+  right_shoulder_roll: 3,
+  left_shoulder_roll: 4,
+  right_elbow: 5,
+  left_elbow: 6,
+  right_hip_yaw: 7,
+  left_hip_yaw: 8,
+  right_hip_roll: 9,
+  left_hip_roll: 10,
+  right_hip_pitch: 11,
+  left_hip_pitch: 12,
+  right_knee: 13,
+  left_knee: 14,
+  right_ankle_pitch: 15,
+  left_ankle_pitch: 16,
+  right_ankle_roll: 17,
+  left_ankle_roll: 18,
+  neck_yaw: 19,
+  neck_pitch: 20,
+};
+
 function GetActionsButton() {
   const client = useClient();
   const logger = useLogger();
@@ -26,12 +49,11 @@ function GetActionsButton() {
           const fixedPoses = [];
           const rawPoses = jsonActionsData[key].poses;
           for (let i = 0; i < rawPoses.length; i += 1) {
-            let idJointCounter = -1;
             const jointsData = [];
-            Object.keys(rawPoses[i].joints).forEach((index) => {
-              idJointCounter += 1;
+            Object.keys(jointIdList).forEach((index) => {
+              const idJoint = jointIdList[index];
               jointsData.push({
-                id: idJointCounter,
+                id: idJoint,
                 name: index,
                 pose_pos: rawPoses[i].joints[index],
               });
