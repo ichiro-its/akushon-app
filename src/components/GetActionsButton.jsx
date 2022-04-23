@@ -51,9 +51,9 @@ function GetActionsButton() {
           for (let i = 0; i < rawPoses.length; i += 1) {
             const jointsData = [];
             Object.keys(jointIdList).forEach((index) => {
-              const idJoint = jointIdList[index];
+              const jointId = jointIdList[index];
               jointsData.push({
-                id: idJoint,
+                id: jointId,
                 name: index,
                 pose_pos: rawPoses[i].joints[index],
               });

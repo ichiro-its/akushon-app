@@ -161,11 +161,11 @@ function ActionManager() {
     const currentJointPoseData = [];
 
     Object.keys(jointIdList).forEach((key) => {
-      const idJoint = jointIdList[key];
+      const jointId = jointIdList[key];
       currentJointPoseData.push({
-        id: idJoint,
+        id: jointId,
         name: key,
-        pose_pos: currentPoses.joints[idJoint - 1].pose_pos,
+        pose_pos: currentPoses.joints[jointId - 1].pose_pos,
       });
     });
     setJointPoseData(currentJointPoseData);
