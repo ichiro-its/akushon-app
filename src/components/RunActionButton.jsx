@@ -41,9 +41,10 @@ function RunActionButton() {
       poses: fixedPoses,
     };
 
+    const action_name = "akushon_app_action";
     const json = JSON.stringify(rawAction);
     return client
-      .call({ json })
+      .call({ action_name, json })
       .then((response) => {
         logger.success(
           `Successfully publish actions data with status ${response.status}.`
