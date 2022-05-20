@@ -444,12 +444,12 @@ function ActionManager() {
                 </CardContent>
               </Card>
               <div style={{ marginTop: 10, marginBottom: -10 }}>
-                <ClientProvider
-                  serviceType="akushon_interfaces/srv/RunAction"
-                  serviceName="/action/run_action"
+                <PublisherProvider
+                  messageType="akushon_interfaces/msg/RunAction"
+                  topicName="/action/run_action"
                 >
                   <RunActionButton />
-                </ClientProvider>
+                </PublisherProvider>
                 <Button
                   style={{ marginLeft: 8 }}
                   variant="contained"
