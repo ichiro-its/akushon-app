@@ -1,24 +1,24 @@
 import { Button, CircularProgress } from "@material-ui/core";
 
-import { useClient, useHandleProcess, useLogger } from "kumo-app";
+import { usePublisher, useHandleProcess, useLogger } from "kumo-app";
 
 import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
 
 function RunActionButton() {
-  const client = useClient();
+  const publisher = usePublisher();
   const logger = useLogger();
 
   const { currentAction } = useContext(ActionContext);
 
-  const [calling, handleCall] = useHandleProcess(() => {
+  const [publishing, handlePublish] = useHandleProcess(() => {
     const fixedPoses = [];
     const rawPoses = currentAction.poses;
 
     if (Object.keys(currentAction).length === 0) {
       logger.warn(`No current action selected.`);
-      return client;
+      return publisher;
     }
 
     for (let i = 0; i < rawPoses.length; i += 1) {
@@ -41,13 +41,13 @@ function RunActionButton() {
       poses: fixedPoses,
     };
 
+    const control_type = 1;
+    const action_name = "akushon_app_action";
     const json = JSON.stringify(rawAction);
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully publish actions data with status ${response.status}.`
-        );
+    return publisher
+      .publish({ control_type, action_name, json })
+      .then(() => {
+        logger.success(`Successfully publish actions data to run action.`);
       })
       .catch((err) => {
         logger.error(`Failed to publish data! ${err.message}.`);
@@ -56,12 +56,12 @@ function RunActionButton() {
 
   return (
     <Button
-      onClick={handleCall}
-      disabled={client == null || calling}
+      onClick={handlePublish}
+      disabled={publisher == null || publishing}
       color="primary"
       variant="contained"
     >
-      {calling ? <CircularProgress size={24} /> : "Play Action"}
+      {publishing ? <CircularProgress size={24} /> : "Play Action"}
     </Button>
   );
 }
