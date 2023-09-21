@@ -1,18 +1,19 @@
-import { Button, CircularProgress } from "@material-ui/core";
-
-import { useClient, useHandleProcess, useLogger } from "kumo-app";
-
+/* eslint-disable */
 import React, { useContext } from "react";
+
+import { Button } from "@material-ui/core";
+
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
 function SaveActionsButton() {
-  const client = useClient();
-  const logger = useLogger();
+  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const message = new akushon_interfaces.ConfigActions();
 
   const { actionsData } = useContext(ActionContext);
 
-  const [calling, handleCall] = useHandleProcess(() => {
+  const handleCall = () => {
     const jsonActionsData = actionsData;
     const rawActions = {};
     Object.keys(jsonActionsData).forEach((key) => {
@@ -42,20 +43,18 @@ function SaveActionsButton() {
     });
     const json = JSON.stringify(rawActions);
     if (actionsData.length === 0) {
-      logger.warn(`No actions data. Call the actions data first.`);
+      console.log(`No actions data. Call the actions data first.`);
       return client;
     }
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully send actions data with status ${response.status}.`
-        );
-      })
-      .catch((err) => {
-        logger.error(`Failed to send data! ${err.message}.`);
-      });
-  }, 500);
+
+    client.saveConfig(message, {}, (err) => {
+      if (err) {
+        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      } else {
+        console.log(`Successfully saved actions data`);
+      }
+    });
+  };
 
   return (
     <Button
@@ -66,11 +65,10 @@ function SaveActionsButton() {
         paddingLeft: 16,
         paddingRight: 16,
       }}
-      disabled={client == null || calling}
       color="primary"
       variant="contained"
     >
-      {calling ? <CircularProgress size={24} /> : "Save"}
+      Save
     </Button>
   );
 }

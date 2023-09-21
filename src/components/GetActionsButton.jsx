@@ -1,8 +1,9 @@
-import { Button, CircularProgress } from "@material-ui/core";
-
-import { useClient, useHandleProcess, useLogger } from "kumo-app";
-
+/* eslint-disable */
 import React, { useContext } from "react";
+
+import { Button } from "@material-ui/core";
+
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
@@ -30,16 +31,18 @@ const jointIdList = {
 };
 
 function GetActionsButton() {
-  const client = useClient();
-  const logger = useLogger();
+  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const request = new akushon_interfaces.Empty();
   const { setActionsData } = useContext(ActionContext);
 
-  const [calling, handleCall] = useHandleProcess(() => {
-    logger.info("Get actions now...");
-    return client
-      .call({})
-      .then((response) => {
-        logger.success(`Successfully get actions data`);
+  const handleCall = () => {
+    console.log('Get actions now...');
+
+    client.getConfig(request, {}, (err, response) => {
+      if (err) {
+        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      } else {
+        console.log('Successfully get actions data');
         const jsonActionsData = JSON.parse(`${response.json}`);
 
         let idCounter = -1;
@@ -76,21 +79,18 @@ function GetActionsButton() {
           });
         });
         setActionsData(rawActions);
-      })
-      .catch((err) => {
-        logger.error(`Failed to call data! ${err.message}.`);
-      });
-  }, 500);
+      }
+    });
+  };
 
   return (
     <Button
       style={{ paddingLeft: 24, paddingRight: 24, marginLeft: 8 }}
       onClick={handleCall}
-      disabled={client === null || calling}
       color="primary"
       variant="contained"
     >
-      {calling ? <CircularProgress size={24} /> : "Get Actions"}
+      Get Actions
     </Button>
   );
 }
