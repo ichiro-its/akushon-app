@@ -8,13 +8,11 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 12,
+    ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["prettier"],
   rules: {
     camelcase: "off",
-    "prettier/prettier": "error",
     "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
   },
 };
