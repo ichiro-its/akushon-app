@@ -4,11 +4,13 @@ import { Button, CircularProgress, Grid } from "@material-ui/core";
 import WbIncandescentRoundedIcon from "@material-ui/icons/WbIncandescentRounded";
 import WbIncandescentOutlinedIcon from "@material-ui/icons/WbIncandescentOutlined";
 
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
+
 import ActionContext from "../context/ActionContext";
 
 function SetTorquesButton() {
-  const publisher = usePublisher();
-  const logger = useLogger();
+  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const message = new akushon_interfaces.SetTorquesData();
 
   const { jointSelected, setJointRobotData, jointRobotData } =
     useContext(ActionContext);
@@ -19,16 +21,16 @@ function SetTorquesButton() {
   const [onTorquesClicked, setOnTorquesClicked] = useState(false);
   const [offTorquesClicked, setOffTorquesClicked] = useState(false);
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const handlePublish = () => {
     const ids = jointSelected;
     const torque_enable = isTorquesEnabled;
     setOffTorquesClicked(false);
     setOnTorquesClicked(false);
     if (ids.length === 0) {
-      logger.warn(
+      console.log(
         `No selected joints. Select some joint first to be set on/off.`
       );
-      return publisher;
+      return client;
     }
 
     for (let i = 0; i < ids.length; i += 1) {
@@ -47,18 +49,15 @@ function SetTorquesButton() {
     }
     setJointRobotData(newJointRobotData);
 
-    if (publishing) {
-      logger.info(`Set torques ${torque_enable}, ids: ${ids}...`);
-    }
-    return publisher
-      .publish({ ids, torque_enable })
-      .then(() => {
-        logger.success(`Successfully publish set torques.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set torques data! ${err.message}.`);
-      });
-  }, 500);
+    message.setIds(ids);
+    message.setTorqueEnable(torque_enable);
+
+    client.publishSetTorques(message, {}, (err) => {
+      if (err) {
+        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      }
+    });
+  };
 
   useEffect(() => {
     handlePublish();

@@ -319,5 +319,66 @@ proto.akushon_interfaces.proto.ConfigPromiseClient.prototype.runAction =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.akushon_interfaces.proto.SetTorquesData,
+ *   !proto.akushon_interfaces.proto.Empty>}
+ */
+const methodDescriptor_Config_PublishSetTorques = new grpc.web.MethodDescriptor(
+  '/akushon_interfaces.proto.Config/PublishSetTorques',
+  grpc.web.MethodType.UNARY,
+  proto.akushon_interfaces.proto.SetTorquesData,
+  proto.akushon_interfaces.proto.Empty,
+  /**
+   * @param {!proto.akushon_interfaces.proto.SetTorquesData} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.akushon_interfaces.proto.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.akushon_interfaces.proto.SetTorquesData} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.akushon_interfaces.proto.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.akushon_interfaces.proto.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.akushon_interfaces.proto.ConfigClient.prototype.publishSetTorques =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/akushon_interfaces.proto.Config/PublishSetTorques',
+      request,
+      metadata || {},
+      methodDescriptor_Config_PublishSetTorques,
+      callback);
+};
+
+
+/**
+ * @param {!proto.akushon_interfaces.proto.SetTorquesData} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.akushon_interfaces.proto.Empty>}
+ *     Promise that resolves to the response
+ */
+proto.akushon_interfaces.proto.ConfigPromiseClient.prototype.publishSetTorques =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/akushon_interfaces.proto.Config/PublishSetTorques',
+      request,
+      metadata || {},
+      methodDescriptor_Config_PublishSetTorques);
+};
+
+
 export default proto.akushon_interfaces.proto;
 
