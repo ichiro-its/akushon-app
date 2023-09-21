@@ -3,16 +3,12 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PropTypes from "prop-types";
 import { Button, CircularProgress } from "@material-ui/core";
 
-import { useHandleProcess, useLogger, usePublisher } from "kumo-app";
-
 import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
 
 function SetJointsButton(props) {
   const { typeButton } = props;
-  const publisher = usePublisher();
-  const logger = useLogger();
 
   const { setJointRobotData, jointPoseData } = useContext(ActionContext);
 

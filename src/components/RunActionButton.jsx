@@ -1,14 +1,10 @@
 import { Button, CircularProgress } from "@material-ui/core";
 
-import { usePublisher, useHandleProcess, useLogger } from "kumo-app";
-
 import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
 
 function RunActionButton() {
-  const publisher = usePublisher();
-  const logger = useLogger();
 
   const { currentAction } = useContext(ActionContext);
 

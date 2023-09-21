@@ -1,5 +1,3 @@
-import { SubscriptionProvider } from "kumo-app";
-
 import React, { useContext, useState, useEffect } from "react";
 
 import ActionContext from "../context/ActionContext";
