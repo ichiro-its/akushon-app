@@ -10,13 +10,13 @@ import React, { useContext } from "react";
 
 import ActionContext from "../context/ActionContext";
 
-// import SetTorquesButton from "./SetTorquesButton";
+import SetTorquesButton from "./SetTorquesButton";
 import SetJointsButton from "./SetJointsButton";
 import GetActionsButton from "./GetActionsButton";
 import RunActionButton from "./RunActionButton";
 import SaveActionsButton from "./SaveActionsButton";
-// import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
-// import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
+import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
+import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
 
 const actionColumns = [
   {
@@ -440,7 +440,7 @@ function ActionManager() {
               </Button>
             </div>
           </Grid>
-          {/* <Grid item xs={12} lg={3}>
+          <Grid item xs={12} lg={3}>
             <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={jointPoseData}
@@ -462,23 +462,23 @@ function ActionManager() {
               />
             </div>
             <div style={{ marginTop: 10, float: "right" }}>
-              <PublisherProvider
+              {/* <PublisherProvider
                 messageType="tachimawari_interfaces/msg/SetJoints"
                 topicName="/joint/set_joints"
-              >
+              > */}
                 <SetJointsButton typeButton="to_robot" />
-              </PublisherProvider>
+              {/* </PublisherProvider> */}
             </div>
           </Grid>
           <Grid item xs={6} lg={3}>
             <div style={{ height: 680, width: "100%" }}>
-              <PublisherProvider
+              {/* <PublisherProvider
                 messageType="tachimawari_interfaces/msg/SetJoints"
                 topicName="/joint/set_joints"
-              >
+              > */}
                 <SetJointsOnCellEdit />
-              </PublisherProvider>
-              <SubscriptionCurrentJoints />
+              {/* </PublisherProvider> */}
+              {/* <SubscriptionCurrentJoints /> */}
             </div>
             <div style={{ marginTop: 10, float: "left" }}>
               <Grid container spacing={1}>
@@ -492,16 +492,16 @@ function ActionManager() {
                   />
                 </Grid>
                 <Grid item xs={8}>
-                  <PublisherProvider
+                  {/* <PublisherProvider
                     messageType="tachimawari_interfaces/msg/SetTorques"
                     topicName="/joint/set_torques"
-                  >
+                  > */}
                     <SetTorquesButton />
-                  </PublisherProvider>
+                  {/* </PublisherProvider> */}
                 </Grid>
               </Grid>
             </div>
-          </Grid> */}
+          </Grid>
         </Grid>
       </CardContent>
     </Card>
