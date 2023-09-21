@@ -1,14 +1,18 @@
+import React, { useContext } from "react";
+
 import { Button, CircularProgress } from "@material-ui/core";
 
-import React, { useContext } from "react";
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
 function RunActionButton() {
+  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const message = new akushon_interfaces.ConfigRunAction();
 
   const { currentAction } = useContext(ActionContext);
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const handlePublish = () => {
     const fixedPoses = [];
     const rawPoses = currentAction.poses;
 
@@ -37,27 +41,26 @@ function RunActionButton() {
       poses: fixedPoses,
     };
 
-    const control_type = 1;
-    const action_name = "akushon_app_action";
     const json = JSON.stringify(rawAction);
-    return publisher
-      .publish({ control_type, action_name, json })
-      .then(() => {
-        logger.success(`Successfully publish actions data to run action.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish data! ${err.message}.`);
-      });
-  }, 500);
+
+    message.setControlType(1);
+    message.setActionName("akushon_app_action");
+    message.setJson(json);
+
+    client.runAction(message, {}, (err) => {
+      if (err) {
+        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      }
+    });
+  };
 
   return (
     <Button
       onClick={handlePublish}
-      disabled={publisher == null || publishing}
       color="primary"
       variant="contained"
     >
-      {publishing ? <CircularProgress size={24} /> : "Play Action"}
+      Play Action
     </Button>
   );
 }

@@ -203,8 +203,8 @@ proto.akushon_interfaces.proto.ConfigPromiseClient.prototype.saveConfig =
  *   !proto.akushon_interfaces.proto.SetJointsData,
  *   !proto.akushon_interfaces.proto.Empty>}
  */
-const methodDescriptor_Config_publishSetJoints = new grpc.web.MethodDescriptor(
-  '/akushon_interfaces.proto.Config/publishSetJoints',
+const methodDescriptor_Config_PublishSetJoints = new grpc.web.MethodDescriptor(
+  '/akushon_interfaces.proto.Config/PublishSetJoints',
   grpc.web.MethodType.UNARY,
   proto.akushon_interfaces.proto.SetJointsData,
   proto.akushon_interfaces.proto.Empty,
@@ -232,10 +232,10 @@ const methodDescriptor_Config_publishSetJoints = new grpc.web.MethodDescriptor(
 proto.akushon_interfaces.proto.ConfigClient.prototype.publishSetJoints =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/akushon_interfaces.proto.Config/publishSetJoints',
+      '/akushon_interfaces.proto.Config/PublishSetJoints',
       request,
       metadata || {},
-      methodDescriptor_Config_publishSetJoints,
+      methodDescriptor_Config_PublishSetJoints,
       callback);
 };
 
@@ -251,10 +251,71 @@ proto.akushon_interfaces.proto.ConfigClient.prototype.publishSetJoints =
 proto.akushon_interfaces.proto.ConfigPromiseClient.prototype.publishSetJoints =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/akushon_interfaces.proto.Config/publishSetJoints',
+      '/akushon_interfaces.proto.Config/PublishSetJoints',
       request,
       metadata || {},
-      methodDescriptor_Config_publishSetJoints);
+      methodDescriptor_Config_PublishSetJoints);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.akushon_interfaces.proto.ConfigRunAction,
+ *   !proto.akushon_interfaces.proto.Empty>}
+ */
+const methodDescriptor_Config_RunAction = new grpc.web.MethodDescriptor(
+  '/akushon_interfaces.proto.Config/RunAction',
+  grpc.web.MethodType.UNARY,
+  proto.akushon_interfaces.proto.ConfigRunAction,
+  proto.akushon_interfaces.proto.Empty,
+  /**
+   * @param {!proto.akushon_interfaces.proto.ConfigRunAction} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.akushon_interfaces.proto.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.akushon_interfaces.proto.ConfigRunAction} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.akushon_interfaces.proto.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.akushon_interfaces.proto.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.akushon_interfaces.proto.ConfigClient.prototype.runAction =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/akushon_interfaces.proto.Config/RunAction',
+      request,
+      metadata || {},
+      methodDescriptor_Config_RunAction,
+      callback);
+};
+
+
+/**
+ * @param {!proto.akushon_interfaces.proto.ConfigRunAction} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.akushon_interfaces.proto.Empty>}
+ *     Promise that resolves to the response
+ */
+proto.akushon_interfaces.proto.ConfigPromiseClient.prototype.runAction =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/akushon_interfaces.proto.Config/RunAction',
+      request,
+      metadata || {},
+      methodDescriptor_Config_RunAction);
 };
 
 

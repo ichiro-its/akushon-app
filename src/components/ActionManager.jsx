@@ -427,7 +427,7 @@ function ActionManager() {
                 messageType="akushon_interfaces/msg/RunAction"
                 topicName="/action/run_action"
               > */}
-                {/* <RunActionButton /> */}
+                <RunActionButton />
               {/* </PublisherProvider> */}
               <Button
                 style={{ marginLeft: 8 }}
