@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState } from "react";
 import MuiAppBar from "@material-ui/core/AppBar";
 import MuiToolbar from "@material-ui/core/Toolbar";

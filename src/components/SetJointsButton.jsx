@@ -1,18 +1,23 @@
+import React, { useContext } from "react";
+
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PropTypes from "prop-types";
 import { Button, CircularProgress } from "@material-ui/core";
 
-import React, { useContext } from "react";
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
 function SetJointsButton(props) {
+  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const message = new akushon_interfaces.SetJointsData();
+
   const { typeButton } = props;
 
   const { setJointRobotData, jointPoseData } = useContext(ActionContext);
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const handlePublish = () => {
     const joints = [];
 
     if (typeButton === "to_robot") {
@@ -38,27 +43,25 @@ function SetJointsButton(props) {
 
     const control_type = 3;
 
-    return publisher
-      .publish({ control_type, joints })
-      .then(() => {
-        logger.success(`Successfully publish set joints.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set joints data! ${err.message}.`);
-      });
-  }, 500);
+    message.setJointsData = JSON.stringify(joints);
+    message.setControlType = control_type;
+
+    client.publishSetJoints(message, {}, (err) => {
+      if (err) {
+        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      }
+    });
+  };
 
   return (
     <Button
       onClick={handlePublish}
-      disabled={publisher === null || publishing}
       color={typeButton === "to_robot" ? "default" : "primary"}
       variant="contained"
       startIcon={
         typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
       }
     >
-      {publishing ? <CircularProgress size={24} /> : ""}
     </Button>
   );
 }

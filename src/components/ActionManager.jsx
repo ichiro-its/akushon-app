@@ -1,4 +1,3 @@
-/* eslint-disable */
 import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
@@ -12,9 +11,9 @@ import React, { useContext } from "react";
 import ActionContext from "../context/ActionContext";
 
 // import SetTorquesButton from "./SetTorquesButton";
-// import SetJointsButton from "./SetJointsButton";
+import SetJointsButton from "./SetJointsButton";
 import GetActionsButton from "./GetActionsButton";
-// import RunActionButton from "./RunActionButton";
+import RunActionButton from "./RunActionButton";
 import SaveActionsButton from "./SaveActionsButton";
 // import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
 // import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
@@ -256,7 +255,7 @@ function ActionManager() {
                 <GetActionsButton />
             </div>
           </Grid>
-          {/* <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={6} lg={3}>
             <Card>
               <CardContent>
                 <MuiTypography variant="subtitle1">Action</MuiTypography>
@@ -317,12 +316,12 @@ function ActionManager() {
                   />
                 </div>
                 <div style={{ marginTop: 10, marginBottom: -10 }}>
-                  <PublisherProvider
+                  {/* <PublisherProvider
                     messageType="tachimawari_interfaces/msg/SetJoints"
                     topicName="/joint/set_joints"
-                  >
+                  > */}
                     <SetJointsButton typeButton="run_pose" />
-                  </PublisherProvider>
+                  {/* </PublisherProvider> */}
                   <Button
                     style={{ marginLeft: 8 }}
                     variant="contained"
@@ -424,12 +423,12 @@ function ActionManager() {
               </CardContent>
             </Card>
             <div style={{ marginTop: 10, marginBottom: -10 }}>
-              <PublisherProvider
+              {/* <PublisherProvider
                 messageType="akushon_interfaces/msg/RunAction"
                 topicName="/action/run_action"
-              >
-                <RunActionButton />
-              </PublisherProvider>
+              > */}
+                {/* <RunActionButton /> */}
+              {/* </PublisherProvider> */}
               <Button
                 style={{ marginLeft: 8 }}
                 variant="contained"
@@ -441,7 +440,7 @@ function ActionManager() {
               </Button>
             </div>
           </Grid>
-          <Grid item xs={12} lg={3}>
+          {/* <Grid item xs={12} lg={3}>
             <div style={{ height: 680, width: "100%" }}>
               <DataGrid
                 rows={jointPoseData}

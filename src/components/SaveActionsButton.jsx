@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useContext } from "react";
 
 import { Button } from "@material-ui/core";
