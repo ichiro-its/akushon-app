@@ -1,5 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
+
 import ActionContext from "../context/ActionContext";
 
 const jointIdList = {
@@ -26,25 +28,36 @@ const jointIdList = {
 };
 
 function SubscriptionCurrentJoints() {
+  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const request = new akushon_interfaces.Empty();
+
   const [currentJoints, setCurrentJoints] = useState([]);
   const { setJointRobotData, jointRobotData } = useContext(ActionContext);
 
-  const subscriptionCallback = (message) => {
-    setCurrentJoints((prevCurrentJoints) => {
-      let jointChangeCounter = 0;
-      prevCurrentJoints.forEach((joint, index) => {
-        if (message.joints[index].position === joint.position) {
-          jointChangeCounter += 1;
-        }
-      });
-
-      if (jointChangeCounter !== message.joints.length) {
-        return message.joints;
+  const handleSubscription = () => {
+    client.subscribeCurrentJoints(request, {}, (err, response) => {
+      if (err) {
+        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      } else {
+        setCurrentJoints((prevCurrentJoints) => {
+          let jointChangeCounter = 0;
+          prevCurrentJoints.forEach((joint, index) => {
+            if (message.joints[index].position === joint.position) {
+              jointChangeCounter += 1;
+            }
+          });
+    
+          if (jointChangeCounter !== message.joints.length) {
+            return message.joints;
+          }
+    
+          return prevCurrentJoints;
+        });
       }
-
-      return prevCurrentJoints;
     });
   };
+
+  handleSubscription();
 
   useEffect(() => {
     if (jointRobotData.length !== 0) {
@@ -67,14 +80,6 @@ function SubscriptionCurrentJoints() {
       });
     }
   }, [currentJoints]);
-
-  return (
-    <SubscriptionProvider
-      messageType="tachimawari_interfaces/msg/CurrentJoints"
-      topicName="/joint/current_joints"
-      callback={subscriptionCallback}
-    />
-  );
 }
 
 export default SubscriptionCurrentJoints;
