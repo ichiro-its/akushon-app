@@ -21,7 +21,7 @@ function SetJointsButton(props) {
     const joints = [];
 
     if (typeButton === "to_robot") {
-      logger.info(`Change the joint robot data...`);
+      console.log(`Change the joint robot data...`);
       const newJointRobotData = [];
       for (let i = 0; i < jointPoseData.length; i += 1) {
         newJointRobotData.push({

@@ -231,7 +231,7 @@ function ActionManager() {
       };
       updatePosesData(newPose);
     } else {
-      logger.error("Joint robot data is empty!");
+      console.log("Joint robot data is empty!");
     }
   };
 
