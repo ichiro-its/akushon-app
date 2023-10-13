@@ -14,6 +14,7 @@ import SetTorquesButton from "./SetTorquesButton";
 import SetJointsButton from "./SetJointsButton";
 import GetActionsButton from "./GetActionsButton";
 import RunActionButton from "./RunActionButton";
+import AddDataButton from "./AddDataButton";
 import SaveActionsButton from "./SaveActionsButton";
 import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
 import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
@@ -316,21 +317,8 @@ function ActionManager() {
                   />
                 </div>
                 <div style={{ marginTop: 10, marginBottom: -10 }}>
-                  {/* <PublisherProvider
-                    messageType="tachimawari_interfaces/msg/SetJoints"
-                    topicName="/joint/set_joints"
-                  > */}
-                    <SetJointsButton typeButton="run_pose" />
-                  {/* </PublisherProvider> */}
-                  <Button
-                    style={{ marginLeft: 8 }}
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<AddIcon />}
-                  >
-                    Add Pose
-                  </Button>
+                  <SetJointsButton typeButton="run_pose" />
+                  <AddDataButton typeData="pose" />
                   <Button
                     style={{ marginLeft: 8 }}
                     variant="contained"
@@ -423,21 +411,8 @@ function ActionManager() {
               </CardContent>
             </Card>
             <div style={{ marginTop: 10, marginBottom: -10 }}>
-              {/* <PublisherProvider
-                messageType="akushon_interfaces/msg/RunAction"
-                topicName="/action/run_action"
-              > */}
-                <RunActionButton />
-              {/* </PublisherProvider> */}
-              <Button
-                style={{ marginLeft: 8 }}
-                variant="contained"
-                color="default"
-                className="button"
-                startIcon={<AddIcon />}
-              >
-                Add Action
-              </Button>
+              <RunActionButton />
+              <AddDataButton typeData="action"/>
             </div>
           </Grid>
           <Grid item xs={12} lg={3}>
@@ -462,23 +437,12 @@ function ActionManager() {
               />
             </div>
             <div style={{ marginTop: 10, float: "right" }}>
-              {/* <PublisherProvider
-                messageType="tachimawari_interfaces/msg/SetJoints"
-                topicName="/joint/set_joints"
-              > */}
                 <SetJointsButton typeButton="to_robot" />
-              {/* </PublisherProvider> */}
             </div>
           </Grid>
           <Grid item xs={6} lg={3}>
             <div style={{ height: 680, width: "100%" }}>
-              {/* <PublisherProvider
-                messageType="tachimawari_interfaces/msg/SetJoints"
-                topicName="/joint/set_joints"
-              > */}
                 <SetJointsOnCellEdit />
-              {/* </PublisherProvider> */}
-              {/* <SubscriptionCurrentJoints /> */}
             </div>
             <div style={{ marginTop: 10, float: "left" }}>
               <Grid container spacing={1}>
