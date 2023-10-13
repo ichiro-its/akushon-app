@@ -30,7 +30,7 @@ const jointIdList = {
 };
 
 function GetActionsButton() {
-  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
   const request = new akushon_interfaces.Empty();
   const { setActionsData } = useContext(ActionContext);
 

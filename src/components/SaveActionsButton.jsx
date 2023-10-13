@@ -7,7 +7,7 @@ import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 import ActionContext from "../context/ActionContext";
 
 function SaveActionsButton() {
-  const client = new akushon_interfaces.ConfigClient(`${import.meta.env.GRPC_WEB_API_URL}`, null, null);
+  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
   const message = new akushon_interfaces.ConfigActions();
 
   const { actionsData } = useContext(ActionContext);
