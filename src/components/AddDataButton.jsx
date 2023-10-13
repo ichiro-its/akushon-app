@@ -14,7 +14,7 @@ function AddDataButton(props) {
       alert("Please get the actions data first.");
       return;
     }
-    
+
     if (typeData === "action") {
       const newAction = {
         id: actionsData.length + 1,
@@ -22,7 +22,6 @@ function AddDataButton(props) {
         next: "",
         start_delay: 0,
         stop_delay: 0,
-        next: "",
         poses: [],
       };
 
