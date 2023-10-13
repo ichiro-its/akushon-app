@@ -30,7 +30,7 @@ function SetTorquesButton() {
       console.log(
         `No selected joints. Select some joint first to be set on/off.`
       );
-      return client;
+      return;
     }
 
     for (let i = 0; i < ids.length; i += 1) {
@@ -49,10 +49,12 @@ function SetTorquesButton() {
     }
     setJointRobotData(newJointRobotData);
 
-    message.setIds(ids);
+    const ids_message = (JSON.stringify(ids));
+
+    message.setIds(ids_message);
     message.setTorqueEnable(torque_enable);
 
-    client.publishSetTorques(message, {}, (err) => {
+    client.setTorques(message, {}, (err) => {
       if (err) {
         console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       }

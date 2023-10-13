@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PropTypes from "prop-types";
-import { Button, CircularProgress } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 
 import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
@@ -42,9 +42,10 @@ function SetJointsButton(props) {
     }
 
     const control_type = 3;
+    const joints_action = (JSON.stringify(joints));
 
-    message.setJointsData = JSON.stringify(joints);
-    message.setControlType = control_type;
+    message.setJointsActions(joints_action);
+    message.setControlType(control_type);
 
     client.publishSetJoints(message, {}, (err) => {
       if (err) {

@@ -2,15 +2,24 @@
 /**
  * @fileoverview
  * @enhanceable
+ * @suppress {missingRequire} reports error on implicit type usages.
  * @suppress {messageConventions} JS Compiler reports an error if a variable or
  *     field starts with 'MSG_' and isn't a translatable message.
  * @public
  */
 // GENERATED CODE -- DO NOT EDIT!
+/* eslint-disable */
+// @ts-nocheck
 
 var jspb = require('google-protobuf');
 var goog = jspb;
-var global = Function('return this')();
+var global =
+    (typeof globalThis !== 'undefined' && globalThis) ||
+    (typeof window !== 'undefined' && window) ||
+    (typeof global !== 'undefined' && global) ||
+    (typeof self !== 'undefined' && self) ||
+    (function () { return this; }).call(null) ||
+    Function('return this')();
 
 goog.exportSymbol('proto.akushon_interfaces.proto.ConfigActions', null, global);
 goog.exportSymbol('proto.akushon_interfaces.proto.ConfigRunAction', null, global);
@@ -408,7 +417,7 @@ proto.akushon_interfaces.proto.SetJointsData.prototype.toObject = function(opt_i
 proto.akushon_interfaces.proto.SetJointsData.toObject = function(includeInstance, msg) {
   var f, obj = {
     controlType: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    jointsData: jspb.Message.getFieldWithDefault(msg, 2, "")
+    jointsActions: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -451,7 +460,7 @@ proto.akushon_interfaces.proto.SetJointsData.deserializeBinaryFromReader = funct
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setJointsData(value);
+      msg.setJointsActions(value);
       break;
     default:
       reader.skipField();
@@ -489,7 +498,7 @@ proto.akushon_interfaces.proto.SetJointsData.serializeBinaryToWriter = function(
       f
     );
   }
-  f = message.getJointsData();
+  f = message.getJointsActions();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -518,10 +527,10 @@ proto.akushon_interfaces.proto.SetJointsData.prototype.setControlType = function
 
 
 /**
- * optional string joints_data = 2;
+ * optional string joints_actions = 2;
  * @return {string}
  */
-proto.akushon_interfaces.proto.SetJointsData.prototype.getJointsData = function() {
+proto.akushon_interfaces.proto.SetJointsData.prototype.getJointsActions = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -530,7 +539,7 @@ proto.akushon_interfaces.proto.SetJointsData.prototype.getJointsData = function(
  * @param {string} value
  * @return {!proto.akushon_interfaces.proto.SetJointsData} returns this
  */
-proto.akushon_interfaces.proto.SetJointsData.prototype.setJointsData = function(value) {
+proto.akushon_interfaces.proto.SetJointsData.prototype.setJointsActions = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -1013,6 +1022,5 @@ proto.akushon_interfaces.proto.CurrentJoints.prototype.getMsgJoints = function()
 proto.akushon_interfaces.proto.CurrentJoints.prototype.setMsgJoints = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
-
 
 export default proto.akushon_interfaces.proto;

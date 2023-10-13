@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { Button, CircularProgress } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 
 import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
@@ -45,7 +45,7 @@ function RunActionButton() {
 
     message.setControlType(1);
     message.setActionName("akushon_app_action");
-    message.setJson(json);
+    message.setJsonAction(json);
 
     client.runAction(message, {}, (err) => {
       if (err) {

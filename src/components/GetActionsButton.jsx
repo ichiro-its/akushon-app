@@ -42,7 +42,7 @@ function GetActionsButton() {
         console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       } else {
         console.log('Successfully get actions data');
-        const jsonActionsData = JSON.parse(`${response.json}`);
+        const jsonActionsData = JSON.parse(response);
 
         let idCounter = -1;
         const rawActions = [];
