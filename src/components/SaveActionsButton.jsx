@@ -13,6 +13,11 @@ function SaveActionsButton() {
   const { actionsData } = useContext(ActionContext);
 
   const handleCall = () => {
+    if (actionsData.length === 0) {
+      console.log(`No actions data. Call the actions data first.`);
+      return;
+    }
+
     const jsonActionsData = actionsData;
     const rawActions = {};
     Object.keys(jsonActionsData).forEach((key) => {
@@ -41,10 +46,8 @@ function SaveActionsButton() {
       rawActions[jsonActionsData[key].name.toLowerCase()] = action;
     });
     const json = JSON.stringify(rawActions);
-    if (actionsData.length === 0) {
-      console.log(`No actions data. Call the actions data first.`);
-      return client;
-    }
+
+    message.setJsonActions(json);
 
     client.saveConfig(message, {}, (err) => {
       if (err) {

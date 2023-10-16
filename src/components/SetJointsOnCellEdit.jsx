@@ -52,8 +52,10 @@ function SetJointsOnCellEdit() {
       });
     }
 
+    const json = JSON.stringify(joints);
+
     message.setControlType(3);
-    message.setJointsData(joints);
+    message.setJointsActions(json);
 
     client.publishSetJoints(message, {}, (err) => {
       if (err) {

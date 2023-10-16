@@ -44,7 +44,7 @@ function RunActionButton() {
     const json = JSON.stringify(rawAction);
 
     message.setControlType(1);
-    message.setActionName("akushon_app_action");
+    message.setActionName(currentAction.name);
     message.setJsonAction(json);
 
     client.runAction(message, {}, (err) => {
