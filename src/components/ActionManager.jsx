@@ -1,7 +1,4 @@
-import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import { DataGrid } from "@material-ui/data-grid";
 import MuiTypography from "@material-ui/core/Typography";
 import { Button, Card, CardContent, Grid, TextField } from "@material-ui/core";
@@ -15,9 +12,10 @@ import SetJointsButton from "./SetJointsButton";
 import GetActionsButton from "./GetActionsButton";
 import RunActionButton from "./RunActionButton";
 import AddDataButton from "./AddDataButton";
+import ManagePoseButton from "./ManagePoseButton";
 import SaveActionsButton from "./SaveActionsButton";
 import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
-import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
+import GetCurrentJoints from "./GetCurrentJoints";
 
 const actionColumns = [
   {
@@ -138,6 +136,8 @@ function ActionManager() {
   } = useContext(ActionContext);
 
   const handleClickedAction = (event) => {
+    console.log(actionsData);
+    console.log(event.row);
     setCurrentAction(event.row);
     const currentPoses = actionsData[event.row.id].poses;
     setPosesData(currentPoses);
@@ -149,7 +149,6 @@ function ActionManager() {
     setJointPoseData([]);
 
     const currentPoses = posesData[event.row.id];
-
     const currentJointPoseData = [];
 
     Object.keys(jointIdList).forEach((key) => {
@@ -180,6 +179,7 @@ function ActionManager() {
       newPose,
       ...posesData.slice(newPose.id + 1),
     ];
+    console.log(newPosesData);
     setPosesData(newPosesData);
 
     const newAction = {
@@ -212,6 +212,7 @@ function ActionManager() {
   };
 
   const setJointRobotToPoseData = () => {
+    {/* <GetCurrentJoints /> */}
     if (jointRobotData.length !== 0) {
       const newJointPoseData = [];
       for (let i = 0; i < jointRobotData.length; i += 1) {
@@ -254,6 +255,7 @@ function ActionManager() {
             <div style={{ marginTop: 10 }}>
                 <SaveActionsButton />
                 <GetActionsButton />
+                <AddDataButton typeData="action"/>
             </div>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -319,24 +321,9 @@ function ActionManager() {
                 <div style={{ marginTop: 10, marginBottom: -10 }}>
                   <SetJointsButton typeButton="run_pose" />
                   <AddDataButton typeData="pose" />
-                  <Button
-                    style={{ marginLeft: 8 }}
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<ArrowUpwardIcon />}
-                  >
-                    Up
-                  </Button>
-                  <Button
-                    style={{ marginLeft: 8 }}
-                    variant="contained"
-                    color="default"
-                    className="button"
-                    startIcon={<ArrowDownwardIcon />}
-                  >
-                    Down
-                  </Button>
+                  <ManagePoseButton typeButton="UP" />
+                  <ManagePoseButton typeButton="DOWN" />
+                  <ManagePoseButton typeButton="DELETE" />
                 </div>
               </CardContent>
             </Card>
@@ -370,12 +357,12 @@ function ActionManager() {
                   variant="outlined"
                   margin="dense"
                   type="number"
-                  value={currentPose ? currentPose.speed : ""}
+                  value={currentPose ? currentPose.speed : 0}
                   onChange={(event) => {
                     const newPose = {
                       id: currentPose.id,
                       name: currentPose.name,
-                      speed: event.target.value,
+                      speed: Number(event.target.value),
                       pause: currentPose.pause,
                       joints: currentPose.joints,
                     };
@@ -392,13 +379,13 @@ function ActionManager() {
                   variant="outlined"
                   margin="dense"
                   type="number"
-                  value={currentPose ? currentPose.pause : ""}
+                  value={currentPose ? currentPose.pause : 0}
                   onChange={(event) => {
                     const newPose = {
                       id: currentPose.id,
                       name: currentPose.name,
                       speed: currentPose.speed,
-                      pause: event.target.value,
+                      pause: Number(event.target.value),
                       joints: currentPose.joints,
                     };
                     updatePosesData(newPose);
@@ -412,7 +399,6 @@ function ActionManager() {
             </Card>
             <div style={{ marginTop: 10, marginBottom: -10 }}>
               <RunActionButton />
-              <AddDataButton typeData="action"/>
             </div>
           </Grid>
           <Grid item xs={12} lg={3}>
@@ -443,6 +429,7 @@ function ActionManager() {
           <Grid item xs={6} lg={3}>
             <div style={{ height: 680, width: "100%" }}>
                 <SetJointsOnCellEdit />
+
             </div>
             <div style={{ marginTop: 10, float: "left" }}>
               <Grid container spacing={1}>
