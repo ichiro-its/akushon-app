@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { Button } from "@material-ui/core";
+import { LoadingButton } from "@mui/lab";
 
 import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
@@ -11,13 +11,14 @@ function SaveActionsButton() {
   const message = new akushon_interfaces.ConfigActions();
 
   const { actionsData } = useContext(ActionContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCall = () => {
     if (actionsData.length === 0) {
       console.log(`No actions data. Call the actions data first.`);
       return;
     }
-
+    setIsLoading(true);
     const jsonActionsData = actionsData;
     const rawActions = {};
     Object.keys(jsonActionsData).forEach((key) => {
@@ -56,10 +57,12 @@ function SaveActionsButton() {
         console.log(`Successfully saved actions data`);
       }
     });
+
+    setIsLoading(false);
   };
 
   return (
-    <Button
+    <LoadingButton
       onClick={handleCall}
       style={{
         background: "#11cb5f",
@@ -69,9 +72,10 @@ function SaveActionsButton() {
       }}
       color="primary"
       variant="contained"
+      loading={isLoading}
     >
       Save
-    </Button>
+    </LoadingButton>
   );
 }
 

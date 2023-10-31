@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
@@ -16,8 +16,10 @@ function SetJointsButton(props) {
   const { typeButton } = props;
 
   const { setJointRobotData, jointPoseData } = useContext(ActionContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePublish = () => {
+    setIsLoading(true);
     const joints = [];
 
     if (typeButton === "to_robot") {
@@ -52,18 +54,21 @@ function SetJointsButton(props) {
         console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       }
     });
+
+    setIsLoading(false);
   };
 
   return (
-    <Button
+    <LoadingButton
       onClick={handlePublish}
       color={typeButton === "to_robot" ? "default" : "primary"}
       variant="contained"
       startIcon={
         typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
       }
+      loading={isLoading}
     >
-    </Button>
+    </LoadingButton>
   );
 }
 

@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
-import { Button } from "@material-ui/core";
+import { LoadingButton } from '@mui/lab';
 
 import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
@@ -33,9 +33,11 @@ function GetActionsButton() {
   const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
   const request = new akushon_interfaces.Empty();
   const { setActionsData } = useContext(ActionContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCall = () => {
     console.log('Get actions now...');
+    setIsLoading(true);
 
     client.getConfig(request, {}, (err, response) => {
       if (err) {
@@ -80,17 +82,20 @@ function GetActionsButton() {
         setActionsData(rawActions);
       }
     });
+
+    setIsLoading(false);
   };
 
   return (
-    <Button
+    <LoadingButton
       style={{ paddingLeft: 24, paddingRight: 24, marginLeft: 8 }}
       onClick={handleCall}
       color="primary"
       variant="contained"
+      loading={isLoading}
     >
       Get Actions
-    </Button>
+    </LoadingButton>
   );
 }
 

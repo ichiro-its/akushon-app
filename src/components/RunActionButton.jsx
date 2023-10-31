@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
-import { Button } from "@material-ui/core";
+import { LoadingButton } from '@mui/lab';
 
 import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
@@ -11,8 +11,10 @@ function RunActionButton() {
   const message = new akushon_interfaces.ConfigRunAction();
 
   const { currentAction } = useContext(ActionContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePublish = () => {
+    setIsLoading(true);
     const fixedPoses = [];
     const rawPoses = currentAction.poses;
 
@@ -52,16 +54,19 @@ function RunActionButton() {
         console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       }
     });
+
+    setIsLoading(false);
   };
 
   return (
-    <Button
+    <LoadingButton
       onClick={handlePublish}
       color="primary"
       variant="contained"
+      loading={isLoading}
     >
       Play Action
-    </Button>
+    </LoadingButton>
   );
 }
 
