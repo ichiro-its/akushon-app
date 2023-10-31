@@ -39,7 +39,7 @@ function GetActionsButton() {
 
     client.getConfig(request, {}, (err, response) => {
       if (err) {
-        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       } else {
         console.log('Successfully get actions data');
         const jsonActionsData = JSON.parse(response);

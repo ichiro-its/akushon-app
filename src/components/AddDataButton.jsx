@@ -69,7 +69,6 @@ function AddDataButton(props) {
       setActionsData((prevActionsData) => [...prevActionsData, newAction]);
 
       console.log(`Add new action`);
-      console.log(actionsData);
     }
     else if (typeData === "pose") {
       if (posesData.length === 0) {
@@ -88,7 +87,7 @@ function AddDataButton(props) {
 
       console.log(`Add new pose`);
     } else {
-      console.log(`Unknown type data: ${typeData}`);
+      console.error(`Unknown type data: ${typeData}`);
     }
   };
 

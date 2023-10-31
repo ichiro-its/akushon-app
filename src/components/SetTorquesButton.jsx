@@ -27,7 +27,7 @@ function SetTorquesButton() {
     setOffTorquesClicked(false);
     setOnTorquesClicked(false);
     if (ids.length === 0) {
-      console.log(
+      console.warn(
         `No selected joints. Select some joint first to be set on/off.`
       );
       return;
@@ -56,7 +56,7 @@ function SetTorquesButton() {
 
     client.setTorques(message, {}, (err) => {
       if (err) {
-        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       }
     });
   };

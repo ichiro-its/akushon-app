@@ -15,7 +15,7 @@ import AddDataButton from "./AddDataButton";
 import ManagePoseButton from "./ManagePoseButton";
 import SaveActionsButton from "./SaveActionsButton";
 import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
-import GetCurrentJoints from "./GetCurrentJoints";
+// import GetCurrentJoints from "./GetCurrentJoints";
 
 const actionColumns = [
   {
@@ -136,8 +136,6 @@ function ActionManager() {
   } = useContext(ActionContext);
 
   const handleClickedAction = (event) => {
-    console.log(actionsData);
-    console.log(event.row);
     setCurrentAction(event.row);
     const currentPoses = actionsData[event.row.id].poses;
     setPosesData(currentPoses);
@@ -179,7 +177,6 @@ function ActionManager() {
       newPose,
       ...posesData.slice(newPose.id + 1),
     ];
-    console.log(newPosesData);
     setPosesData(newPosesData);
 
     const newAction = {
@@ -233,7 +230,7 @@ function ActionManager() {
       };
       updatePosesData(newPose);
     } else {
-      console.log("Joint robot data is empty!");
+      console.warn("Joint robot data is empty!");
     }
   };
 

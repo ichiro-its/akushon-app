@@ -17,7 +17,7 @@ function RunActionButton() {
     const rawPoses = currentAction.poses;
 
     if (Object.keys(currentAction).length === 0) {
-      console.log(`No current action selected.`);
+      console.warn(`No current action selected.`);
       return client;
     }
 
@@ -49,7 +49,7 @@ function RunActionButton() {
 
     client.runAction(message, {}, (err) => {
       if (err) {
-        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       }
     });
   };

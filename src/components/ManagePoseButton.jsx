@@ -69,10 +69,8 @@ function ManagePoseButton(props) {
 
       setPosesData(newPosesData);
     } else {
-      console.log(`Unknown type button: ${typeButton}`);
+      console.error(`Unknown type button: ${typeButton}`);
     }
-
-    console.log(posesData);
   }
 
   return (

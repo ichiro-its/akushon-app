@@ -12,3 +12,4 @@ npm-debug.log*
 !.npm*
 
 package-lock.json
+envoy.yaml

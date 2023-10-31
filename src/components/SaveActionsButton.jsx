@@ -51,7 +51,7 @@ function SaveActionsButton() {
 
     client.saveConfig(message, {}, (err) => {
       if (err) {
-        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       } else {
         console.log(`Successfully saved actions data`);
       }

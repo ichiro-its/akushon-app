@@ -37,7 +37,7 @@ function SubscriptionCurrentJoints() {
   const handleSubscription = () => {
     client.subscribeCurrentJoints(request, {}, (err, response) => {
       if (err) {
-        console.log(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
       } else {
         setCurrentJoints((prevCurrentJoints) => {
           let jointChangeCounter = 0;
