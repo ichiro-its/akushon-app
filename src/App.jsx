@@ -3,13 +3,6 @@ import MuiAppBar from "@material-ui/core/AppBar";
 import MuiToolbar from "@material-ui/core/Toolbar";
 import MuiTypography from "@material-ui/core/Typography";
 
-import {
-  BridgeProvider,
-  BridgeConnection,
-  LoggerProvider,
-  SessionProvider,
-} from "kumo-app";
-
 import ActionManager from "./components/ActionManager";
 import ActionContext from "./context/ActionContext";
 import "./App.css";
@@ -22,10 +15,12 @@ function App() {
   const [jointSelected, setJointSelected] = useState([]);
   const [currentAction, setCurrentAction] = useState({});
   const [currentPose, setCurrentPose] = useState({});
+  const GRPC_WEB_API_URL = import.meta.env.VITE_GRPC_WEB_API_URL;
 
   return (
     <ActionContext.Provider
       value={{
+        GRPC_WEB_API_URL,
         actionsData,
         posesData,
         jointPoseData,
@@ -43,19 +38,12 @@ function App() {
       }}
     >
       <div className="root">
-        <LoggerProvider>
-          <BridgeProvider>
-            <BridgeConnection />
-            <SessionProvider>
-              <MuiAppBar position="static">
-                <MuiToolbar>
-                  <MuiTypography variant="h6">Akushon App</MuiTypography>
-                </MuiToolbar>
-              </MuiAppBar>
-              <ActionManager />
-            </SessionProvider>
-          </BridgeProvider>
-        </LoggerProvider>
+        <MuiAppBar position="static">
+          <MuiToolbar>
+            <MuiTypography variant="h6">Akushon App</MuiTypography>
+          </MuiToolbar>
+        </MuiAppBar>
+        <ActionManager />
       </div>
     </ActionContext.Provider>
   );

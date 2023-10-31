@@ -1,26 +1,30 @@
+import React, { useContext, useState } from "react";
+
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PropTypes from "prop-types";
-import { Button, CircularProgress } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 
-import { useHandleProcess, useLogger, usePublisher } from "kumo-app";
-
-import React, { useContext } from "react";
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
 function SetJointsButton(props) {
+  const { setJointRobotData, jointPoseData, GRPC_WEB_API_URL } = useContext(ActionContext);
+
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const message = new akushon_interfaces.SetJointsData();
+
   const { typeButton } = props;
-  const publisher = usePublisher();
-  const logger = useLogger();
 
-  const { setJointRobotData, jointPoseData } = useContext(ActionContext);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const handlePublish = () => {
+    setIsLoading(true);
     const joints = [];
 
     if (typeButton === "to_robot") {
-      logger.info(`Change the joint robot data...`);
+      console.log(`Change the joint robot data...`);
       const newJointRobotData = [];
       for (let i = 0; i < jointPoseData.length; i += 1) {
         newJointRobotData.push({
@@ -41,29 +45,31 @@ function SetJointsButton(props) {
     }
 
     const control_type = 3;
+    const joints_action = (JSON.stringify(joints));
 
-    return publisher
-      .publish({ control_type, joints })
-      .then(() => {
-        logger.success(`Successfully publish set joints.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set joints data! ${err.message}.`);
-      });
-  }, 500);
+    message.setJointsActions(joints_action);
+    message.setControlType(control_type);
+
+    client.publishSetJoints(message, {}, (err) => {
+      if (err) {
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      }
+    });
+
+    setIsLoading(false);
+  };
 
   return (
-    <Button
+    <LoadingButton
       onClick={handlePublish}
-      disabled={publisher === null || publishing}
       color={typeButton === "to_robot" ? "default" : "primary"}
       variant="contained"
       startIcon={
         typeButton === "to_robot" ? <ArrowForwardIcon /> : <PlayArrowIcon />
       }
+      loading={isLoading}
     >
-      {publishing ? <CircularProgress size={24} /> : ""}
-    </Button>
+    </LoadingButton>
   );
 }
 

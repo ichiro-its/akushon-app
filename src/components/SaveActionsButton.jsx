@@ -1,18 +1,25 @@
-import { Button, CircularProgress } from "@material-ui/core";
-
-import { useClient, useHandleProcess, useLogger } from "kumo-app";
-
 import React, { useContext } from "react";
+
+import { LoadingButton } from "@mui/lab";
+
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
 function SaveActionsButton() {
-  const client = useClient();
-  const logger = useLogger();
+  const { actionsData, GRPC_WEB_API_URL } = useContext(ActionContext);
 
-  const { actionsData } = useContext(ActionContext);
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const message = new akushon_interfaces.ConfigActions();
 
-  const [calling, handleCall] = useHandleProcess(() => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCall = () => {
+    if (actionsData.length === 0) {
+      console.log(`No actions data. Call the actions data first.`);
+      return;
+    }
+    setIsLoading(true);
     const jsonActionsData = actionsData;
     const rawActions = {};
     Object.keys(jsonActionsData).forEach((key) => {
@@ -41,24 +48,22 @@ function SaveActionsButton() {
       rawActions[jsonActionsData[key].name.toLowerCase()] = action;
     });
     const json = JSON.stringify(rawActions);
-    if (actionsData.length === 0) {
-      logger.warn(`No actions data. Call the actions data first.`);
-      return client;
-    }
-    return client
-      .call({ json })
-      .then((response) => {
-        logger.success(
-          `Successfully send actions data with status ${response.status}.`
-        );
-      })
-      .catch((err) => {
-        logger.error(`Failed to send data! ${err.message}.`);
-      });
-  }, 500);
+
+    message.setJsonActions(json);
+
+    client.saveConfig(message, {}, (err) => {
+      if (err) {
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      } else {
+        console.log(`Successfully saved actions data`);
+      }
+    });
+
+    setIsLoading(false);
+  };
 
   return (
-    <Button
+    <LoadingButton
       onClick={handleCall}
       style={{
         background: "#11cb5f",
@@ -66,12 +71,12 @@ function SaveActionsButton() {
         paddingLeft: 16,
         paddingRight: 16,
       }}
-      disabled={client == null || calling}
       color="primary"
       variant="contained"
+      loading={isLoading}
     >
-      {calling ? <CircularProgress size={24} /> : "Save"}
-    </Button>
+      Save
+    </LoadingButton>
   );
 }
 

@@ -1,24 +1,27 @@
-import { Button, CircularProgress } from "@material-ui/core";
+import React, { useContext, useState } from "react";
 
-import { usePublisher, useHandleProcess, useLogger } from "kumo-app";
+import { LoadingButton } from '@mui/lab';
 
-import React, { useContext } from "react";
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
 function RunActionButton() {
-  const publisher = usePublisher();
-  const logger = useLogger();
+  const { currentAction, GRPC_WEB_API_URL } = useContext(ActionContext);
 
-  const { currentAction } = useContext(ActionContext);
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const message = new akushon_interfaces.ConfigRunAction();
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePublish = () => {
+    setIsLoading(true);
     const fixedPoses = [];
     const rawPoses = currentAction.poses;
 
     if (Object.keys(currentAction).length === 0) {
-      logger.warn(`No current action selected.`);
-      return publisher;
+      console.warn(`No current action selected.`);
+      return client;
     }
 
     for (let i = 0; i < rawPoses.length; i += 1) {
@@ -41,28 +44,30 @@ function RunActionButton() {
       poses: fixedPoses,
     };
 
-    const control_type = 1;
-    const action_name = "akushon_app_action";
     const json = JSON.stringify(rawAction);
-    return publisher
-      .publish({ control_type, action_name, json })
-      .then(() => {
-        logger.success(`Successfully publish actions data to run action.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish data! ${err.message}.`);
-      });
-  }, 500);
+
+    message.setControlType(1);
+    message.setActionName(currentAction.name);
+    message.setJsonAction(json);
+
+    client.runAction(message, {}, (err) => {
+      if (err) {
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      }
+    });
+
+    setIsLoading(false);
+  };
 
   return (
-    <Button
+    <LoadingButton
       onClick={handlePublish}
-      disabled={publisher == null || publishing}
       color="primary"
       variant="contained"
+      loading={isLoading}
     >
-      {publishing ? <CircularProgress size={24} /> : "Play Action"}
-    </Button>
+      Play Action
+    </LoadingButton>
   );
 }
 

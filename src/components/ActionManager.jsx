@@ -1,17 +1,7 @@
-import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import { DataGrid } from "@material-ui/data-grid";
 import MuiTypography from "@material-ui/core/Typography";
 import { Button, Card, CardContent, Grid, TextField } from "@material-ui/core";
-
-import {
-  ClientProvider,
-  NodeProvider,
-  PublisherProvider,
-  useLogger,
-} from "kumo-app";
 
 import React, { useContext } from "react";
 
@@ -21,9 +11,11 @@ import SetTorquesButton from "./SetTorquesButton";
 import SetJointsButton from "./SetJointsButton";
 import GetActionsButton from "./GetActionsButton";
 import RunActionButton from "./RunActionButton";
+import AddDataButton from "./AddDataButton";
+import ManagePoseButton from "./ManagePoseButton";
 import SaveActionsButton from "./SaveActionsButton";
 import SetJointsOnCellEdit from "./SetJointsOnCellEdit";
-import SubscriptionCurrentJoints from "./SubscriptionCurrentJoints";
+// import GetCurrentJoints from "./GetCurrentJoints";
 
 const actionColumns = [
   {
@@ -143,8 +135,6 @@ function ActionManager() {
     setCurrentPose,
   } = useContext(ActionContext);
 
-  const logger = useLogger();
-
   const handleClickedAction = (event) => {
     setCurrentAction(event.row);
     const currentPoses = actionsData[event.row.id].poses;
@@ -157,7 +147,6 @@ function ActionManager() {
     setJointPoseData([]);
 
     const currentPoses = posesData[event.row.id];
-
     const currentJointPoseData = [];
 
     Object.keys(jointIdList).forEach((key) => {
@@ -220,6 +209,7 @@ function ActionManager() {
   };
 
   const setJointRobotToPoseData = () => {
+    {/* <GetCurrentJoints /> */}
     if (jointRobotData.length !== 0) {
       const newJointPoseData = [];
       for (let i = 0; i < jointRobotData.length; i += 1) {
@@ -240,294 +230,229 @@ function ActionManager() {
       };
       updatePosesData(newPose);
     } else {
-      logger.error("Joint robot data is empty!");
+      console.warn("Joint robot data is empty!");
     }
   };
 
   return (
-    <NodeProvider nodeName="akushon_app">
-      <Card>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={3}>
-              <div style={{ height: 680, width: "100%" }}>
-                <DataGrid
-                  rows={actionsData}
-                  columns={actionColumns}
-                  rowHeight={32}
-                  disableColumnMenu
-                  rowsPerPageOptions={[]}
-                  onRowClick={handleClickedAction}
-                />
-              </div>
-              <div style={{ marginTop: 10 }}>
-                <ClientProvider
-                  serviceType="akushon_interfaces/srv/SaveActions"
-                  serviceName="/akushon/config/save_actions"
-                >
-                  <SaveActionsButton />
-                </ClientProvider>
-                <ClientProvider
-                  serviceType="akushon_interfaces/srv/GetActions"
-                  serviceName="/akushon/config/get_actions"
-                >
-                  <GetActionsButton />
-                </ClientProvider>
-              </div>
-            </Grid>
-            <Grid item xs={12} md={6} lg={3}>
-              <Card>
-                <CardContent>
-                  <MuiTypography variant="subtitle1">Action</MuiTypography>
-                  <div style={{ marginBottom: 10 }}>
-                    <TextField
-                      id="action-name"
-                      label="Name"
-                      variant="outlined"
-                      margin="dense"
-                      value={currentAction ? currentAction.name : ""}
-                      onChange={(event) => {
-                        const newAction = {
-                          id: currentAction.id,
-                          name: event.target.value,
-                          next: currentAction.next,
-                          start_delay: currentAction.start_delay,
-                          stop_delay: currentAction.stop_delay,
-                          poses: currentAction.poses,
-                        };
-                        updateActionsData(newAction);
-                      }}
-                      style={{ margin: 3, marginTop: 20, width: "60%" }}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                    <TextField
-                      id="action-next"
-                      label="Next"
-                      variant="outlined"
-                      margin="dense"
-                      value={currentAction ? currentAction.next : ""}
-                      onChange={(event) => {
-                        const newAction = {
-                          id: currentAction.id,
-                          name: currentAction.name,
-                          next: event.target.value,
-                          start_delay: currentAction.start_delay,
-                          stop_delay: currentAction.stop_delay,
-                          poses: currentAction.poses,
-                        };
-                        updateActionsData(newAction);
-                      }}
-                      style={{ margin: 3, marginTop: 20, width: "30%" }}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </div>
-                  <div style={{ height: 360, width: "100%" }}>
-                    <DataGrid
-                      rows={posesData}
-                      columns={poseColumns}
-                      rowHeight={32}
-                      disableColumnMenu
-                      rowsPerPageOptions={[]}
-                      onRowClick={handleClickedPose}
-                    />
-                  </div>
-
-                  <div style={{ marginTop: 10, marginBottom: -10 }}>
-                    <PublisherProvider
-                      messageType="tachimawari_interfaces/msg/SetJoints"
-                      topicName="/joint/set_joints"
-                    >
-                      <SetJointsButton typeButton="run_pose" />
-                    </PublisherProvider>
-                    <Button
-                      style={{ marginLeft: 8 }}
-                      variant="contained"
-                      color="default"
-                      className="button"
-                      startIcon={<AddIcon />}
-                    >
-                      Add Pose
-                    </Button>
-                    <Button
-                      style={{ marginLeft: 8 }}
-                      variant="contained"
-                      color="default"
-                      className="button"
-                      startIcon={<ArrowUpwardIcon />}
-                    >
-                      Up
-                    </Button>
-                    <Button
-                      style={{ marginLeft: 8 }}
-                      variant="contained"
-                      color="default"
-                      className="button"
-                      startIcon={<ArrowDownwardIcon />}
-                    >
-                      Down
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card style={{ marginTop: 10 }}>
-                <CardContent>
-                  <MuiTypography variant="subtitle1">Pose</MuiTypography>
+    <Card>
+      <CardContent>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6} lg={3}>
+            <div style={{ height: 680, width: "100%" }}>
+              <DataGrid
+                rows={actionsData}
+                columns={actionColumns}
+                rowHeight={32}
+                disableColumnMenu
+                rowsPerPageOptions={[]}
+                onRowClick={handleClickedAction}
+              />
+            </div>
+            <div style={{ marginTop: 10 }}>
+                <SaveActionsButton />
+                <GetActionsButton />
+                <AddDataButton typeData="action"/>
+            </div>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <Card>
+              <CardContent>
+                <MuiTypography variant="subtitle1">Action</MuiTypography>
+                <div style={{ marginBottom: 10 }}>
                   <TextField
-                    id="pose-name"
+                    id="action-name"
                     label="Name"
                     variant="outlined"
                     margin="dense"
-                    value={currentPose ? currentPose.name : ""}
+                    value={currentAction ? currentAction.name : ""}
                     onChange={(event) => {
-                      const newPose = {
-                        id: currentPose.id,
+                      const newAction = {
+                        id: currentAction.id,
                         name: event.target.value,
-                        speed: currentPose.speed,
-                        pause: currentPose.pause,
-                        joints: currentPose.joints,
+                        next: currentAction.next,
+                        start_delay: currentAction.start_delay,
+                        stop_delay: currentAction.stop_delay,
+                        poses: currentAction.poses,
                       };
-                      updatePosesData(newPose);
+                      updateActionsData(newAction);
                     }}
-                    style={{ margin: 3, marginTop: 20, width: "40%" }}
+                    style={{ margin: 3, marginTop: 20, width: "60%" }}
                     InputLabelProps={{
                       shrink: true,
                     }}
                   />
                   <TextField
-                    id="pose-speed"
-                    label="Speed"
+                    id="action-next"
+                    label="Next"
                     variant="outlined"
                     margin="dense"
-                    type="number"
-                    value={currentPose ? currentPose.speed : ""}
+                    value={currentAction ? currentAction.next : ""}
                     onChange={(event) => {
-                      const newPose = {
-                        id: currentPose.id,
-                        name: currentPose.name,
-                        speed: event.target.value,
-                        pause: currentPose.pause,
-                        joints: currentPose.joints,
+                      const newAction = {
+                        id: currentAction.id,
+                        name: currentAction.name,
+                        next: event.target.value,
+                        start_delay: currentAction.start_delay,
+                        stop_delay: currentAction.stop_delay,
+                        poses: currentAction.poses,
                       };
-                      updatePosesData(newPose);
+                      updateActionsData(newAction);
                     }}
-                    style={{ margin: 3, marginTop: 20, width: "25%" }}
+                    style={{ margin: 3, marginTop: 20, width: "30%" }}
                     InputLabelProps={{
                       shrink: true,
                     }}
                   />
-                  <TextField
-                    id="pose-pause"
-                    label="Pause"
-                    variant="outlined"
-                    margin="dense"
-                    type="number"
-                    value={currentPose ? currentPose.pause : ""}
-                    onChange={(event) => {
-                      const newPose = {
-                        id: currentPose.id,
-                        name: currentPose.name,
-                        speed: currentPose.speed,
-                        pause: event.target.value,
-                        joints: currentPose.joints,
-                      };
-                      updatePosesData(newPose);
-                    }}
-                    style={{ margin: 3, marginTop: 20, width: "25%" }}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
+                </div>
+                <div style={{ height: 360, width: "100%" }}>
+                  <DataGrid
+                    rows={posesData}
+                    columns={poseColumns}
+                    rowHeight={32}
+                    disableColumnMenu
+                    rowsPerPageOptions={[]}
+                    onRowClick={handleClickedPose}
                   />
-                </CardContent>
-              </Card>
-              <div style={{ marginTop: 10, marginBottom: -10 }}>
-                <PublisherProvider
-                  messageType="akushon_interfaces/msg/RunAction"
-                  topicName="/action/run_action"
-                >
-                  <RunActionButton />
-                </PublisherProvider>
-                <Button
-                  style={{ marginLeft: 8 }}
-                  variant="contained"
-                  color="default"
-                  className="button"
-                  startIcon={<AddIcon />}
-                >
-                  Add Action
-                </Button>
-              </div>
-            </Grid>
-
-            <Grid item xs={12} lg={3}>
-              <div style={{ height: 680, width: "100%" }}>
-                <DataGrid
-                  rows={jointPoseData}
-                  columns={jointPoseColumns}
-                  rowHeight={25}
-                  onCellEditCommit={(event) => {
-                    const index = jointPoseData.findIndex(
-                      (joint) => joint.id === event.id
-                    );
-                    const newJoints = {
-                      id: jointPoseData[index].id,
-                      name: jointPoseData[index].name,
-                      pose_pos: event.value,
+                </div>
+                <div style={{ marginTop: 10, marginBottom: -10 }}>
+                  <SetJointsButton typeButton="run_pose" />
+                  <AddDataButton typeData="pose" />
+                  <ManagePoseButton typeButton="UP" />
+                  <ManagePoseButton typeButton="DOWN" />
+                  <ManagePoseButton typeButton="DELETE" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card style={{ marginTop: 10 }}>
+              <CardContent>
+                <MuiTypography variant="subtitle1">Pose</MuiTypography>
+                <TextField
+                  id="pose-name"
+                  label="Name"
+                  variant="outlined"
+                  margin="dense"
+                  value={currentPose ? currentPose.name : ""}
+                  onChange={(event) => {
+                    const newPose = {
+                      id: currentPose.id,
+                      name: event.target.value,
+                      speed: currentPose.speed,
+                      pause: currentPose.pause,
+                      joints: currentPose.joints,
                     };
-                    updateJointPoseData(newJoints, index);
+                    updatePosesData(newPose);
                   }}
-                  disableColumnMenu
-                  rowsPerPageOptions={[]}
+                  style={{ margin: 3, marginTop: 20, width: "40%" }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
-              </div>
-              <div style={{ marginTop: 10, float: "right" }}>
-                <PublisherProvider
-                  messageType="tachimawari_interfaces/msg/SetJoints"
-                  topicName="/joint/set_joints"
-                >
-                  <SetJointsButton typeButton="to_robot" />
-                </PublisherProvider>
-              </div>
-            </Grid>
-            <Grid item xs={6} lg={3}>
-              <div style={{ height: 680, width: "100%" }}>
-                <PublisherProvider
-                  messageType="tachimawari_interfaces/msg/SetJoints"
-                  topicName="/joint/set_joints"
-                >
-                  <SetJointsOnCellEdit />
-                </PublisherProvider>
-                <SubscriptionCurrentJoints />
-              </div>
-              <div style={{ marginTop: 10, float: "left" }}>
-                <Grid container spacing={1}>
-                  <Grid item xs={4}>
-                    <Button
-                      variant="contained"
-                      color="default"
-                      className="button"
-                      startIcon={<ArrowBackIcon />}
-                      onClick={setJointRobotToPoseData}
-                    />
-                  </Grid>
-                  <Grid item xs={8}>
-                    <PublisherProvider
-                      messageType="tachimawari_interfaces/msg/SetTorques"
-                      topicName="/joint/set_torques"
-                    >
-                      <SetTorquesButton />
-                    </PublisherProvider>
-                  </Grid>
-                </Grid>
-              </div>
-            </Grid>
+                <TextField
+                  id="pose-speed"
+                  label="Speed"
+                  variant="outlined"
+                  margin="dense"
+                  type="number"
+                  value={currentPose ? currentPose.speed : 0}
+                  onChange={(event) => {
+                    const newPose = {
+                      id: currentPose.id,
+                      name: currentPose.name,
+                      speed: Number(event.target.value),
+                      pause: currentPose.pause,
+                      joints: currentPose.joints,
+                    };
+                    updatePosesData(newPose);
+                  }}
+                  style={{ margin: 3, marginTop: 20, width: "25%" }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  id="pose-pause"
+                  label="Pause"
+                  variant="outlined"
+                  margin="dense"
+                  type="number"
+                  value={currentPose ? currentPose.pause : 0}
+                  onChange={(event) => {
+                    const newPose = {
+                      id: currentPose.id,
+                      name: currentPose.name,
+                      speed: currentPose.speed,
+                      pause: Number(event.target.value),
+                      joints: currentPose.joints,
+                    };
+                    updatePosesData(newPose);
+                  }}
+                  style={{ margin: 3, marginTop: 20, width: "25%" }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </CardContent>
+            </Card>
+            <div style={{ marginTop: 10, marginBottom: -10 }}>
+              <RunActionButton />
+            </div>
           </Grid>
-        </CardContent>
-      </Card>
-    </NodeProvider>
+          <Grid item xs={12} lg={3}>
+            <div style={{ height: 680, width: "100%" }}>
+              <DataGrid
+                rows={jointPoseData}
+                columns={jointPoseColumns}
+                rowHeight={25}
+                onCellEditCommit={(event) => {
+                  const index = jointPoseData.findIndex(
+                    (joint) => joint.id === event.id
+                  );
+                  const newJoints = {
+                    id: jointPoseData[index].id,
+                    name: jointPoseData[index].name,
+                    pose_pos: event.value,
+                  };
+                  updateJointPoseData(newJoints, index);
+                }}
+                disableColumnMenu
+                rowsPerPageOptions={[]}
+              />
+            </div>
+            <div style={{ marginTop: 10, float: "right" }}>
+                <SetJointsButton typeButton="to_robot" />
+            </div>
+          </Grid>
+          <Grid item xs={6} lg={3}>
+            <div style={{ height: 680, width: "100%" }}>
+                <SetJointsOnCellEdit />
+
+            </div>
+            <div style={{ marginTop: 10, float: "left" }}>
+              <Grid container spacing={1}>
+                <Grid item xs={4}>
+                  <Button
+                    variant="contained"
+                    color="default"
+                    className="button"
+                    startIcon={<ArrowBackIcon />}
+                    onClick={setJointRobotToPoseData}
+                  />
+                </Grid>
+                <Grid item xs={8}>
+                  {/* <PublisherProvider
+                    messageType="tachimawari_interfaces/msg/SetTorques"
+                    topicName="/joint/set_torques"
+                  > */}
+                    <SetTorquesButton />
+                  {/* </PublisherProvider> */}
+                </Grid>
+              </Grid>
+            </div>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
   );
 }
 

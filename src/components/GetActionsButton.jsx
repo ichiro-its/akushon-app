@@ -1,8 +1,8 @@
-import { Button, CircularProgress } from "@material-ui/core";
+import React, { useContext, useState } from "react";
 
-import { useClient, useHandleProcess, useLogger } from "kumo-app";
+import { LoadingButton } from '@mui/lab';
 
-import React, { useContext } from "react";
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
@@ -30,17 +30,23 @@ const jointIdList = {
 };
 
 function GetActionsButton() {
-  const client = useClient();
-  const logger = useLogger();
-  const { setActionsData } = useContext(ActionContext);
+  const { setActionsData, GRPC_WEB_API_URL } = useContext(ActionContext);
 
-  const [calling, handleCall] = useHandleProcess(() => {
-    logger.info("Get actions now...");
-    return client
-      .call({})
-      .then((response) => {
-        logger.success(`Successfully get actions data`);
-        const jsonActionsData = JSON.parse(`${response.json}`);
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const request = new akushon_interfaces.Empty();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCall = () => {
+    console.log('Get actions now...');
+    setIsLoading(true);
+
+    client.getConfig(request, {}, (err, response) => {
+      if (err) {
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      } else {
+        console.log('Successfully get actions data');
+        const jsonActionsData = JSON.parse(response);
 
         let idCounter = -1;
         const rawActions = [];
@@ -76,22 +82,22 @@ function GetActionsButton() {
           });
         });
         setActionsData(rawActions);
-      })
-      .catch((err) => {
-        logger.error(`Failed to call data! ${err.message}.`);
-      });
-  }, 500);
+      }
+    });
+
+    setIsLoading(false);
+  };
 
   return (
-    <Button
+    <LoadingButton
       style={{ paddingLeft: 24, paddingRight: 24, marginLeft: 8 }}
       onClick={handleCall}
-      disabled={client === null || calling}
       color="primary"
       variant="contained"
+      loading={isLoading}
     >
-      {calling ? <CircularProgress size={24} /> : "Get Actions"}
-    </Button>
+      Get Actions
+    </LoadingButton>
   );
 }
 

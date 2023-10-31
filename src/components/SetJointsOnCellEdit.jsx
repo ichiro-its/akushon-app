@@ -1,7 +1,7 @@
-import { useHandleProcess, useLogger, usePublisher } from "kumo-app";
+import React, { useContext } from "react";
 import { DataGrid } from "@material-ui/data-grid";
 
-import React, { useContext } from "react";
+import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 
 import ActionContext from "../context/ActionContext";
 
@@ -27,11 +27,11 @@ const jointRobotColumns = [
 ];
 
 function SetJointsOnCellEdit() {
-  const publisher = usePublisher();
-  const logger = useLogger();
-
-  const { setJointRobotData, jointRobotData, setJointSelected } =
+  const { setJointRobotData, jointRobotData, setJointSelected, GRPC_WEB_API_URL } =
     useContext(ActionContext);
+  
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const message = new akushon_interfaces.SetJointsData();
 
   const updateJointRobotData = (newJoints, index) => {
     const newJointRobotData = [
@@ -42,7 +42,7 @@ function SetJointsOnCellEdit() {
     setJointRobotData(newJointRobotData);
   };
 
-  const [publishing, handlePublish] = useHandleProcess(() => {
+  const handlePublish = () => {
     const joints = [];
 
     for (let i = 0; i < jointRobotData.length; i += 1) {
@@ -52,21 +52,17 @@ function SetJointsOnCellEdit() {
       });
     }
 
-    const control_type = 3;
+    const json = JSON.stringify(joints);
 
-    if (publishing) {
-      logger.info("Publishing...");
-    }
+    message.setControlType(3);
+    message.setJointsActions(json);
 
-    return publisher
-      .publish({ control_type, joints })
-      .then(() => {
-        logger.success(`Successfully publish set joints directly to robot.`);
-      })
-      .catch((err) => {
-        logger.error(`Failed to publish set joints robot! ${err.message}.`);
-      });
-  }, 500);
+    client.publishSetJoints(message, {}, (err) => {
+      if (err) {
+        console.error(`Unexpected error: code = ${err.code}` + `, message = "${err.message}"`);
+      }
+    });
+  };
 
   return (
     <DataGrid
