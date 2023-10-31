@@ -16,6 +16,7 @@
     "@material-ui/data-grid": "*",
     "@material-ui/icons": "^4.11.2",
     "mui-datatables": "^3.7.7",
+    "@mui/lab": "^5.0.0-alpha.149",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "google-protobuf": "^3.21.2",
