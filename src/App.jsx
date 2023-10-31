@@ -15,10 +15,12 @@ function App() {
   const [jointSelected, setJointSelected] = useState([]);
   const [currentAction, setCurrentAction] = useState({});
   const [currentPose, setCurrentPose] = useState({});
+  const GRPC_WEB_API_URL = import.meta.env.VITE_GRPC_WEB_API_URL;
 
   return (
     <ActionContext.Provider
       value={{
+        GRPC_WEB_API_URL,
         actionsData,
         posesData,
         jointPoseData,

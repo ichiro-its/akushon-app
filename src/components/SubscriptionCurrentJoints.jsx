@@ -28,11 +28,12 @@ const jointIdList = {
 };
 
 function SubscriptionCurrentJoints() {
-  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
+  const { setJointRobotData, jointRobotData, GRPC_WEB_API_URL } = useContext(ActionContext);
+
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
   const request = new akushon_interfaces.Empty();
 
   const [currentJoints, setCurrentJoints] = useState([]);
-  const { setJointRobotData, jointRobotData } = useContext(ActionContext);
 
   const handleSubscription = () => {
     client.subscribeCurrentJoints(request, {}, (err, response) => {

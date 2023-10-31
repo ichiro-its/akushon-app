@@ -7,10 +7,11 @@ import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 import ActionContext from "../context/ActionContext";
 
 function RunActionButton() {
-  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
+  const { currentAction, GRPC_WEB_API_URL } = useContext(ActionContext);
+
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
   const message = new akushon_interfaces.ConfigRunAction();
 
-  const { currentAction } = useContext(ActionContext);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePublish = () => {

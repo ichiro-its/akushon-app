@@ -27,11 +27,11 @@ const jointRobotColumns = [
 ];
 
 function SetJointsOnCellEdit() {
-  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
-  const message = new akushon_interfaces.SetJointsData();
-
-  const { setJointRobotData, jointRobotData, setJointSelected } =
+  const { setJointRobotData, jointRobotData, setJointSelected, GRPC_WEB_API_URL } =
     useContext(ActionContext);
+  
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const message = new akushon_interfaces.SetJointsData();
 
   const updateJointRobotData = (newJoints, index) => {
     const newJointRobotData = [

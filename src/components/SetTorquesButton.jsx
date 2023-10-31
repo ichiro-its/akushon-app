@@ -9,11 +9,11 @@ import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 import ActionContext from "../context/ActionContext";
 
 function SetTorquesButton() {
-  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
-  const message = new akushon_interfaces.SetTorquesData();
-
-  const { jointSelected, setJointRobotData, jointRobotData } =
+  const { jointSelected, setJointRobotData, jointRobotData, GRPC_WEB_API_URL } =
     useContext(ActionContext);
+  
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
+  const message = new akushon_interfaces.SetTorquesData();
 
   let newJointRobotData = jointRobotData;
   const [isTorquesEnabled, setIsTorquesEnabled] = useState(true);

@@ -10,12 +10,13 @@ import akushon_interfaces from "../proto/akushon_grpc_web_pb";
 import ActionContext from "../context/ActionContext";
 
 function SetJointsButton(props) {
-  const client = new akushon_interfaces.ConfigClient(import.meta.env.VITE_GRPC_WEB_API_URL, null, null);
+  const { setJointRobotData, jointPoseData, GRPC_WEB_API_URL } = useContext(ActionContext);
+
+  const client = new akushon_interfaces.ConfigClient(GRPC_WEB_API_URL, null, null);
   const message = new akushon_interfaces.SetJointsData();
 
   const { typeButton } = props;
 
-  const { setJointRobotData, jointPoseData } = useContext(ActionContext);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePublish = () => {
